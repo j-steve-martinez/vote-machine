@@ -14,9 +14,12 @@
   //  }
 
    ajaxFunctions.ready(ajaxFunctions.ajaxRequest('GET', apiUrl, function (data) {
-     console.log('userController auth');
-     console.log(data);
-     auth = data;
+    //  console.log('userController auth');
+    //  console.log(typeof data);
+    //  if (typeof data === 'String') {
+    //
+    //  }
+     auth = JSON.parse(data);
     //  if (typeof data === 'object') {
     //    var userObject = JSON.parse(data);
     //    console.log(userObject);

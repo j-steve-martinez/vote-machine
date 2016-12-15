@@ -26,29 +26,23 @@ class Main extends React.Component {
     var url = '/api/allPolls'
     var myRequest = new Request(url);
     fetch(myRequest).then(res => {
-      console.log('allPolls fetch res');
+      // console.log('allPolls fetch res');
       return res.json();
       // this.setState({user : data});
     }).then(allPolls => {
-      console.log('allPolls then');
+      // console.log('allPolls then');
       // console.log('data' + allPolls);
-      console.log(typeof allPolls);
+      // console.log(typeof allPolls);
       var polls = {};
       polls.allPolls = allPolls;
-      console.log(polls);
+      // console.log(polls);
       this.setState(polls);
     });
   }
   render(){
     console.log('Main this.state');
     console.log(this.state);
-    // if (this.state.allPolls === 0) {
-    //   var bodyPanels = "Loading..."
-    // } else {
-    //   var bodyPanels = BP(this.props)
-    // }
-    // this is the mock up
-    // grab the data from mongo
+
     return(
       <div>
         <Header auth={this.state.auth} cb={this.callBack}/>
@@ -97,13 +91,7 @@ const Polls = React.createClass({
     )
   }
 });
-// <div className="panel-body">
-//   <NavLink key={poll.id.toString()}
-//             to={'/poll/' + poll.id}
-//             cb={cb} >
-//             {poll.name}
-//   </NavLink>
-// </div>
+
 function BP(props){
   const polls = props.polls;
   const cb = props.cb;
@@ -143,24 +131,27 @@ const NavLink = React.createClass({
 
 const Header = React.createClass({
   render() {
-    // console.log('header props');
-    // console.log(this.props);
-    var isAuth = JSON.parse(this.props.auth);
+    console.log('header props');
+    console.log(this.props);
+    var isAuth = this.props.auth;
     // console.log('isAuth');
     // console.log(isAuth);
-    var myHeader;
-
+    var myHeader, name;
+    isAuth.id ? name = <span className="navbar-text">Signed in as {isAuth.username}</span> : null
     if (isAuth.id !== undefined && isAuth.id !== false ) {
-      // console.log('is logged in');
-      myHeader = <HeaderLogout cb={this.props.cb}/>;
+      console.log('is logged in');
+      console.log(typeof isAuth);
+      myHeader = <HeaderLogout cb={this.props.cb} isAuth={isAuth}/>;
     } else {
-      // console.log('not logged in');
+      console.log('not logged in');
+      console.log(typeof isAuth);
       myHeader = <HeaderLogin cb={this.props.cb}/>;
     }
     return (
       <div>
         <nav className="navbar navbar-inversed">
           {myHeader}
+          {name}
         </nav>
       </div>
 
@@ -190,8 +181,8 @@ const HeaderLogin = React.createClass({
 
 const HeaderLogout = React.createClass({
   render(){
-    // console.log('HeaderLogout');
-    // console.log(this.props);
+    console.log('HeaderLogout');
+    console.log(this.props);
     return(
       <ul className="nav navbar-nav">
         <li className="nav-item active">

@@ -49,15 +49,17 @@ module.exports = function (app, passport) {
 		});
 
 	app.route('/api/allPolls')
-		// .get(isLoggedIn, clickHandler.getAllPolls)
-		.get(function (req, res) {
-			// mock data request from database
-			var allPolls = [
-				{id: 1, name:'Best This'},
-				{id: 2, name:'Is That Good'}
-			];
-			res.json(allPolls);
-		});
+		.get(clickHandler.getAllPolls)
+		// .get(function (req, res) {
+		// 	console.log('server getting poll data');
+		// 	// mock data request from database
+		// 	console.log(req.url);
+		// 	var allPolls = [
+		// 		{id: 1, name:'Best This'},
+		// 		{id: 2, name:'Is That Good'}
+		// 	];
+		// 	res.json(allPolls);
+		// });
 
 	app.route('/api/:id')
 		.get(isLoggedIn, function (req, res) {

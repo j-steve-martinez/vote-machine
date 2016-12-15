@@ -6,9 +6,13 @@ var Polls = require('../models/polls.js');
 function ClickHandler () {
 	this.getAllPolls = function(req, res){
 		// mock data request from database
+		console.log('clickHandler getAllPolls');
 		var polls = [
 			{id: 1, name:'Best This'},
-			{id: 2, name:'Is That Good'}
+			{id: 2, name:'Is That Good'},
+			{id: 3, name:'Is it Bad'},
+			{id: 4, name:'Are you That Good'},
+			{id: 5, name:'Is That Really Good'}
 		];
 		res.json(polls);
 	}

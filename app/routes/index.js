@@ -24,7 +24,7 @@ module.exports = function (app, passport) {
 			// console.log(req.url);
 			console.log('isAuthenticated false');
 			// res.redirect('/login');
-			res.json({auth: false});
+			res.json({id: false});
 		}
 	}
 

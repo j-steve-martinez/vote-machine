@@ -16,6 +16,7 @@ mongoose.Promise = global.Promise;
 app.use('/controllers', express.static(process.cwd() + '/app/controllers'));
 app.use('/public', express.static(process.cwd() + '/public'));
 app.use('/common', express.static(process.cwd() + '/app/common'));
+app.use('/views', express.static(process.cwd() + '/app/views'));
 
 app.use(session({
 	secret: 'secretClementine',

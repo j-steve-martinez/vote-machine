@@ -8,8 +8,10 @@
    var apiUrl = appUrl + '/api/:id/clicks';
 
    function updateClickCount (data) {
-      var clicksObject = JSON.parse(data);
-      clickNbr.innerHTML = clicksObject.clicks;
+     if (typeof data === 'object') {
+       var clicksObject = JSON.parse(data);
+       clickNbr.innerHTML = clicksObject.clicks;
+     }
    }
 
    ajaxFunctions.ready(ajaxFunctions.ajaxRequest('GET', apiUrl, updateClickCount));

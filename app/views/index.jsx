@@ -1,44 +1,59 @@
 'use strict'
-// const Polls = React.createClass({
+
 class Main extends React.Component {
   constructor(props) {
     super(props);
     // console.log('auth');
     // console.log(auth);
+    // this.getAllPolls();
     if (auth === undefined) {
       auth = {id: false};
     }
-    this.state = {auth};
+    var allPolls = [];
+    this.state = {auth, allPolls};
   }
   callBack(path, type, data){
     console.log('Main callBack called');
     console.log(path);
     console.log(type);
     console.log(data);
+
+  }
+  componentDidMount(){
+    this.getAllPolls();
+  }
+  getAllPolls(){
+    var url = '/api/allPolls'
+    var myRequest = new Request(url);
+    fetch(myRequest).then(res => {
+      console.log('allPolls fetch res');
+      return res.json();
+      // this.setState({user : data});
+    }).then(allPolls => {
+      console.log('allPolls then');
+      // console.log('data' + allPolls);
+      console.log(typeof allPolls);
+      var polls = {};
+      polls.allPolls = allPolls;
+      console.log(polls);
+      this.setState(polls);
+    });
   }
   render(){
     console.log('Main this.state');
     console.log(this.state);
+    // if (this.state.allPolls === 0) {
+    //   var bodyPanels = "Loading..."
+    // } else {
+    //   var bodyPanels = BP(this.props)
+    // }
     // this is the mock up
     // grab the data from mongo
     return(
       <div>
         <Header auth={this.state.auth} cb={this.callBack}/>
         <Body title="The Polls Are Open">
-          <div className="panel panel-primary">
-              <div className="panel-heading">
-                  <h3 className="panel-title">Select a poll to cast your vote</h3>
-              </div>
-              <div className="panel-body">
-                <NavLink cb={this.callBack} to="/api/poll/1">Poll number 1</NavLink>
-              </div>
-              <div className="panel-body">
-                <NavLink cb={this.callBack} to="/api/poll/2">Poll number 2</NavLink>
-              </div>
-              <div className="panel-body">
-                <NavLink cb={this.callBack} to="/api/poll/3">Poll number 3</NavLink>
-              </div>
-          </div>
+          <Polls polls={this.state.allPolls} cb={this.callBack}/>
         </Body>
       </div>
 
@@ -65,6 +80,48 @@ const Body = React.createClass({
   }
 });
 
+const Polls = React.createClass({
+  render(){
+    console.log('Polls');
+    console.log(this.props);
+    var bodyPanels = BP(this.props);
+    console.log('panelBody');
+    console.log(bodyPanels);
+    return(
+        <div className="panel panel-primary">
+            <div className="panel-heading">
+                <h3 className="panel-title">Select a poll to cast your vote</h3>
+            </div>
+            {bodyPanels}
+        </div>
+    )
+  }
+});
+// <div className="panel-body">
+//   <NavLink key={poll.id.toString()}
+//             to={'/poll/' + poll.id}
+//             cb={cb} >
+//             {poll.name}
+//   </NavLink>
+// </div>
+function BP(props){
+  const polls = props.polls;
+  const cb = props.cb;
+  const links = polls.map((poll) =>
+    <div className="panel-body" key={poll.id.toString() }><NavLink
+              to={'/poll/' + poll.id}
+              cb={cb} >
+              {poll.name}
+    </NavLink></div>
+  );
+  return (
+    <span>
+      {links}
+    </span>
+
+  );
+}
+
 const NavLink = React.createClass({
   clickH(e){
     // e.preventDefault();
@@ -79,7 +136,8 @@ const NavLink = React.createClass({
   render() {
     // console.log('NavLink');
     // console.log(this.props);
-    return <a onClick={this.clickH} id={this.props.to} href={this.props.to}>{this.props.children}</a>
+    return <a className={this.props.cn} onClick={this.clickH} id={this.props.to} href={this.props.to}>{this.props.children}</a>;
+
   }
 });
 
@@ -101,7 +159,7 @@ const Header = React.createClass({
     }
     return (
       <div>
-        <nav className="navbar navbar-light bg-faded">
+        <nav className="navbar navbar-inversed">
           {myHeader}
         </nav>
       </div>

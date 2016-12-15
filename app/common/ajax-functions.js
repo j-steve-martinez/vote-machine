@@ -25,26 +25,28 @@ var ajaxFunctions = {
 
       xmlhttp.open(method, url, true);
       xmlhttp.send();
+   },
+   getAllPolls: function getAllPolls(){
+       console.log('getAllPolls started');
+       var myHeaders = new Headers();
+
+       var myInit = { method: 'GET',
+                  headers: myHeaders,
+                  // mode: 'cors',
+                  cache: 'default' };
+
+       var url = '/api/allPolls'
+       var myRequest = new Request(url, myInit);
+       fetch(myRequest).then(res => {
+         console.log('allPolls fetch res');
+         console.log(res.json());
+
+         return res.json();
+         // this.setState({user : data});
+       }).then(allPolls => {
+         console.log('allPolls then');
+         console.log(allPolls);
+         // this.setState(myBlob);
+       });
    }
 };
-
-// The XHR version follows: much more complex
-
-// function retrieveImage(requestObj,imageNo) {
-//   var request = new XMLHttpRequest();
-//   request.open('GET', requestObj, true);
-//   request.responseType = 'blob';
-//   request.send();
-
-//   request.onload = function() {
-//     var objectURL = URL.createObjectURL(request.response);
-//     thumbs[imageNo].setAttribute('src',objectURL);
-//     thumbs[imageNo].onclick = function() {
-//       mainImg.setAttribute('src',objectURL);
-//       mainImg.className = 'blowup';
-//         for(i = 0; i < thumbs.length; i++) {
-//           thumbs[i].className = 'thumb darken';
-//         }
-//     }
-//   }
-// }

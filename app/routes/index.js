@@ -48,16 +48,16 @@ module.exports = function (app, passport) {
 			res.json(poll);
 		});
 
-	app.route('/api/polls')
-		.get(isLoggedIn, clickHandler.getAllPolls)
-		// .get(function (req, res) {
+	app.route('/api/allPolls')
+		// .get(isLoggedIn, clickHandler.getAllPolls)
+		.get(function (req, res) {
 			// mock data request from database
-			// var polls = [
-			// 	{id: 1, name:'Best This'},
-			// 	{id: 2, name:'Is That Good'}
-			// ];
-			// res.json(polls);
-		// });
+			var allPolls = [
+				{id: 1, name:'Best This'},
+				{id: 2, name:'Is That Good'}
+			];
+			res.json(allPolls);
+		});
 
 	app.route('/api/:id')
 		.get(isLoggedIn, function (req, res) {

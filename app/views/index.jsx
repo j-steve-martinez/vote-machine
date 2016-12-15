@@ -15,11 +15,6 @@ class Main extends React.Component {
     console.log(path);
     console.log(type);
     console.log(data);
-    // console.log('auth');
-    // console.log(auth);
-    // if (path === '/login') {
-    //   console.log('login was called');
-    // }
   }
   render(){
     console.log('Main this.state');

@@ -1,8 +1,21 @@
 'use strict';
 
 var Users = require('../models/users.js');
+var Polls = require('../models/polls.js');
 
 function ClickHandler () {
+	this.getAllPolls = function(req, res){
+		// mock data request from database
+		var polls = [
+			{id: 1, name:'Best This'},
+			{id: 2, name:'Is That Good'}
+		];
+		res.json(polls);
+	}
+
+	this.getUserPolls = function(req, res){
+
+	}
 
 	this.getClicks = function (req, res) {
 		Users

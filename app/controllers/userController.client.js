@@ -14,7 +14,7 @@
   //  }
 
    ajaxFunctions.ready(ajaxFunctions.ajaxRequest('GET', apiUrl, function (data) {
-     console.log('ajaxFunction start');
+     console.log('userController auth');
      console.log(data);
      auth = data;
     //  if (typeof data === 'object') {

@@ -1,23 +1,65 @@
 'use strict'
 
+function BP(props){
+  const polls = props.polls;
+  const cb = props.cb;
+  const links = polls.map((poll) =>
+    <div className="panel-body" key={poll.id.toString() }><NavLink
+              to={'/api/poll/' + poll.id}
+              cb={cb} >
+              {poll.name}
+    </NavLink></div>
+  );
+  return (
+    <span>
+      {links}
+    </span>
+
+  );
+}
+
+function NewPollResults(props){
+  let items = props.items;
+  let title = items.shift();
+  // console.log('NewPollResults');
+  // console.log(items);
+  // TODO: make sure list item is unique
+  let listItems = items.map((item, index) =>
+  // console.log(index);
+   <li key={index.toString()}>
+     {item}
+   </li>
+  );
+  return (
+    <div>
+      <h4>{title}</h4>
+      <ul>{listItems}</ul>
+    </div>
+
+  );
+}
+
 class Main extends React.Component {
   constructor(props) {
     super(props);
     // console.log('auth');
     // console.log(auth);
     // this.getAllPolls();
+    this.callBack = this.callBack.bind(this);
     if (auth === undefined) {
       auth = {id: false};
     }
     var allPolls = [];
-    this.state = {auth, allPolls};
+    var path = '/';
+    this.state = {auth, allPolls, path : path};
   }
   callBack(path, type, data){
     console.log('Main callBack called');
     console.log(path);
     console.log(type);
     console.log(data);
-
+    var obj = {'path': path, 'poll': data}
+    this.setState(obj);
   }
   componentDidMount(){
     this.getAllPolls();
@@ -26,13 +68,8 @@ class Main extends React.Component {
     var url = '/api/allPolls'
     var myRequest = new Request(url);
     fetch(myRequest).then(res => {
-      // console.log('allPolls fetch res');
       return res.json();
-      // this.setState({user : data});
     }).then(allPolls => {
-      // console.log('allPolls then');
-      // console.log('data' + allPolls);
-      // console.log(typeof allPolls);
       var polls = {};
       polls.allPolls = allPolls;
       // console.log(polls);
@@ -42,18 +79,44 @@ class Main extends React.Component {
   render(){
     console.log('Main this.state');
     console.log(this.state);
+    var route, path = this.state.path;
+    console.log(path);
+    // \/poll\/\d
+    // \/profile\/\d+
+    var pollRe = /\/api\/poll\/\d+/;
+    var profileRe = /\/profile\/\d+/;
+    var profileNewRe = /\/profile\/\d+\/new/;
 
+    // console.log(path.match(pollRe));
+    // console.log(path.match(profileRe));
+
+    switch (path) {
+      case '/':
+        route =(<Polls polls={this.state.allPolls} cb={this.callBack}/>)
+        break;
+      case '/about':
+        route = (<About />)
+        break;
+      case (path.match(pollRe) || {}).input:
+        route = (<Poll main={this.state}>Poll Test</Poll>)
+        break;
+      case (path.match(profileNewRe) || {}).input:
+        route = (<NewPoll isAuth={this.state.isAuth} />)
+        break;
+      case (path.match(profileRe) || {}).input:
+        route = (<Profile data={this.state} />)
+        console.log('Case match Profile' + path);
+        break;
+      default:
+        route = (<Body title='Default Route'>Route not Found</Body>)
+    }
     return(
       <div>
         <Header auth={this.state.auth} cb={this.callBack}/>
-        <Body title="The Polls Are Open">
-          <Polls polls={this.state.allPolls} cb={this.callBack}/>
-        </Body>
+        {route}
       </div>
-
     )
   }
-// end class
 }
 
 const Body = React.createClass({
@@ -82,44 +145,185 @@ const Polls = React.createClass({
     console.log('panelBody');
     console.log(bodyPanels);
     return(
+      <Body title="The Polls Are Open">
         <div className="panel panel-primary">
             <div className="panel-heading">
                 <h3 className="panel-title">Select a poll to cast your vote</h3>
             </div>
             {bodyPanels}
         </div>
+      </Body>
     )
   }
 });
 
-function BP(props){
-  const polls = props.polls;
-  const cb = props.cb;
-  const links = polls.map((poll) =>
-    <div className="panel-body" key={poll.id.toString() }><NavLink
-              to={'/poll/' + poll.id}
-              cb={cb} >
-              {poll.name}
-    </NavLink></div>
-  );
-  return (
-    <span>
-      {links}
-    </span>
+const Poll = React.createClass({
+  getInitialState(){
+    var mockData = {
+      uid: 1,
+      title: 'Best Thing',
+      list : [
+        {key: 'item1', value: 2},
+        {key: 'item2', value: 5},
+        {key: 'item3', value: 9}
+      ]};
+    return (
+      {data: mockData, message: ''}
+    )
+  },
+  handleSubmit(event){
+    event.preventDefault();
+    var submitted = this.state.value;
+    console.log('submitted: ' + submitted);
 
-  );
-}
+    if (submitted === undefined) {
+      var message = 'Please make a selection'
+      this.setState({message: message})
+    } else {
+      console.log('form select...');
+      console.log(submitted);
+
+      var data = this.state.data;
+      console.log(data);
+    }
+  },
+  handleChange(event){
+    console.log('value: ' + event.target.value);
+    this.setState({value: event.target.value});
+  },
+  render(){
+    console.log('Poll');
+    console.log(this.state);
+    console.log(this.props);
+    // var num = this.props.params.num;
+    var num = 1;
+    var title = this.state.data.title;
+    var list = this.state.data.list;
+    var items = list.map(function(item){
+      return item.key
+    });
+
+    if (items[0]!== '') {
+      items.unshift('')
+    }
+
+    const myOptions = items.map((item, index) =>
+     <option ref={item} key={index} value={item}>
+       {item}
+     </option>
+    );
+    var form =
+      (<Body title={title}>
+        <div>ID: {num}</div>
+        <form onSubmit={this.handleSubmit}>
+          <select value={this.state.value} onChange={this.handleChange}>
+            {myOptions}
+          </select>
+          <div>
+            <button type="submit">Submit</button>
+          </div>
+        </form>
+        {this.state.message}
+      </Body>)
+
+    return (
+      <div>
+        {form}
+      </div>
+    )
+  }
+})
+
+const Profile = React.createClass({
+  render() {
+    console.log('Profile');
+    console.log(this.props);
+    // var uid = this.props.params.uid;
+    return (
+      <Body title='User Profile'>
+        <div>Get a list of the user polls and put here!</div>
+      </Body>
+    )
+  }
+
+});
+
+const NewPoll = React.createClass({
+  getInitialState() {
+    return {
+      items: [],
+      buttonText : 'Create'
+    }
+  },
+  handleSubmit(event){
+    var poll = this.state.items;
+    console.log('Poll:');
+    console.log(poll);
+    // this.props.router.replace('/')
+    event.preventDefault()
+  },
+  handleClick(event){
+    const text = this.refs.atext.value;
+    // console.log('form text...');
+    // console.log(text);
+    let items = text.split(',');
+    // console.log(items);
+    this.setState({items: items, buttonText: 'Update'})
+    event.preventDefault()
+  },
+  render() {
+    console.log('NewPoll');
+    console.log(this.state);
+    if (this.state.items.length <= 0) {
+      var ret = ''
+    } else {
+      var ret = <NewPollResults items={this.state.items} />
+    }
+    return (
+      <Body title='New Poll'>
+        <div>Enter a comma seperated list of items to poll.  The first item should be the poll title</div>
+        <div>The first item should be the poll title. Example:</div>
+        <code>Title, item1, item2, item3</code>
+          <form>
+            <textarea ref='atext'></textarea>
+            <div>
+              <button ref='poll' onClick={this.handleClick}>{this.state.buttonText}</button>
+            </div>
+            {ret}
+            <button ref='submit' onClick={this.handleSubmit}>Submit</button>
+          </form>
+      </Body>
+    )
+  }
+})
 
 const NavLink = React.createClass({
   clickH(e){
     // e.preventDefault();
-    // console.log('myClick');
-    // console.log(e.target.id);
+    console.log('myClick');
+    console.log(e.target.id);
     // prevent default for everything except login and logout
     if (e.target.id.indexOf('log') <= 0 && e.target.id.indexOf('github') <= 0) {
       e.preventDefault();
-      this.props.cb(e.target.id, 'type test', 'data test');
+      this.getData(e.target.id)
+      // this.props.cb(e.target.id, 'type test', 'data test');
     }
+  },
+  getData(url){
+    // var url = '/api/allPolls'
+    var myRequest = new Request(url);
+    fetch(myRequest).then(res => {
+      return res.json();
+    }).then(data => {
+      // var polls = {};
+      // polls.allPolls = allPolls;
+      console.log('fetch: ' + url);
+      console.log(data);
+      console.log('NavLink calling callBack');
+      this.props.cb(url, 'type test', data);
+      // this.setState(polls);
+    });
+
   },
   render() {
     // console.log('NavLink');
@@ -183,16 +387,18 @@ const HeaderLogout = React.createClass({
   render(){
     console.log('HeaderLogout');
     console.log(this.props);
+    var profile = '/profile/' + this.props.isAuth.id;
+    var profileNew = profile + '/new';
     return(
       <ul className="nav navbar-nav">
         <li className="nav-item active">
           <NavLink cb={this.props.cb} cn='nav-link' to="/">Home</NavLink>
         </li>
         <li className="nav-item">
-          <NavLink cb={this.props.cb} cn='nav-link' to="/profile/:id/new">New Poll</NavLink>
+          <NavLink cb={this.props.cb} cn='nav-link' to={profileNew}>New Poll</NavLink>
         </li>
         <li className="nav-item">
-          <NavLink cb={this.props.cb} cn='nav-link' to="/profile/:id">Profile</NavLink>
+          <NavLink cb={this.props.cb} cn='nav-link' to={profile}>Profile</NavLink>
         </li>
         <li className="nav-item">
           <NavLink cb={this.props.cb} cn='nav-link' to="/logout">Logout</NavLink>
@@ -201,6 +407,17 @@ const HeaderLogout = React.createClass({
           <NavLink cb={this.props.cb} cn='nav-link' to="/about">About</NavLink>
         </li>
       </ul>
+    )
+  }
+})
+
+const About = React.createClass({
+  render(){
+    return (
+      <Body title="About App">
+        <div>The Voting Machine</div>
+        <div>By:<a href="https://github.com/j-steve-martinez" target="_blank">J. Steve Martinez</a></div>
+      </Body>
     )
   }
 })

@@ -44,8 +44,16 @@ module.exports = function (app, passport) {
 
 	app.route('/api/poll/:id')
 		.get(function (req, res) {
-			var poll = {id: 1, name:'Best This'};
-			res.json(poll);
+			var poll = {id: 1, name:'Best Mock Data'};
+			var mockData = {
+				uid: 1,
+				title: 'Best Thing',
+				list : [
+					{key: 'item1', value: 2},
+					{key: 'item2', value: 5},
+					{key: 'item3', value: 9}
+				]};
+			res.json(mockData);
 		});
 
 	app.route('/api/allPolls')

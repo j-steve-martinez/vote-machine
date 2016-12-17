@@ -42,6 +42,7 @@ module.exports = function (app, passport) {
 			res.sendFile(path + '/public/profile.html');
 		});
 
+	// get the poll data
 	app.route('/api/poll/:id')
 		.get(function (req, res) {
 			var poll = {id: 1, name:'Best Mock Data'};
@@ -56,24 +57,18 @@ module.exports = function (app, passport) {
 			res.json(mockData);
 		});
 
+	// get all polls
 	app.route('/api/allPolls')
 		.get(clickHandler.getAllPolls)
-		// .get(function (req, res) {
-		// 	console.log('server getting poll data');
-		// 	// mock data request from database
-		// 	console.log(req.url);
-		// 	var allPolls = [
-		// 		{id: 1, name:'Best This'},
-		// 		{id: 2, name:'Is That Good'}
-		// 	];
-		// 	res.json(allPolls);
-		// });
 
+	// get user info
 	app.route('/api/:id')
 		.get(isLoggedIn, function (req, res) {
 			res.json(req.user.github);
 		});
 
+	// to add a new poll
+	// user :id and :poll object
 	app.route('/api/:id/:poll')
 		.get(isLoggedIn, function (req, res) {
 			console.log(req.user.github);
@@ -95,4 +90,9 @@ module.exports = function (app, passport) {
 		.get(isLoggedIn, clickHandler.getClicks)
 		.post(isLoggedIn, clickHandler.addClick)
 		.delete(isLoggedIn, clickHandler.resetClicks);
+
+	// app.route('*').get((req, res) => {
+	// 	// res.send("Don't type in a URL\n Have A Nice Day!");
+	// 	res.redirect('/');
+	// });
 };

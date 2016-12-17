@@ -80,7 +80,7 @@ class Main extends React.Component {
     console.log('Main this.state');
     console.log(this.state);
     var route, path = this.state.path;
-    console.log(path);
+    // console.log(path);
     // \/poll\/\d
     // \/profile\/\d+
     var pollRe = /\/api\/poll\/\d+/;
@@ -142,8 +142,8 @@ const Polls = React.createClass({
     console.log('Polls');
     console.log(this.props);
     var bodyPanels = BP(this.props);
-    console.log('panelBody');
-    console.log(bodyPanels);
+    // console.log('panelBody');
+    // console.log(bodyPanels);
     return(
       <Body title="The Polls Are Open">
         <div className="panel panel-primary">
@@ -305,8 +305,14 @@ const NavLink = React.createClass({
     // prevent default for everything except login and logout
     if (e.target.id.indexOf('log') <= 0 && e.target.id.indexOf('github') <= 0) {
       e.preventDefault();
-      this.getData(e.target.id)
-      // this.props.cb(e.target.id, 'type test', 'data test');
+      // if api call get data or just call the callback
+      if (e.target.id.indexOf('api') !== -1) {
+        console.log('api called');
+        this.getData(e.target.id)
+      } else {
+        console.log('other called');
+        this.props.cb(e.target.id, 'type test', 'data test');
+      }
     }
   },
   getData(url){
@@ -317,9 +323,9 @@ const NavLink = React.createClass({
     }).then(data => {
       // var polls = {};
       // polls.allPolls = allPolls;
-      console.log('fetch: ' + url);
-      console.log(data);
-      console.log('NavLink calling callBack');
+      // console.log('fetch: ' + url);
+      // console.log(data);
+      // console.log('NavLink calling callBack');
       this.props.cb(url, 'type test', data);
       // this.setState(polls);
     });
@@ -343,12 +349,12 @@ const Header = React.createClass({
     var myHeader, name;
     isAuth.id ? name = <span className="navbar-text">Signed in as {isAuth.username}</span> : null
     if (isAuth.id !== undefined && isAuth.id !== false ) {
-      console.log('is logged in');
-      console.log(typeof isAuth);
+      // console.log('is logged in');
+      // console.log(typeof isAuth);
       myHeader = <HeaderLogout cb={this.props.cb} isAuth={isAuth}/>;
     } else {
-      console.log('not logged in');
-      console.log(typeof isAuth);
+      // console.log('not logged in');
+      // console.log(typeof isAuth);
       myHeader = <HeaderLogin cb={this.props.cb}/>;
     }
     return (

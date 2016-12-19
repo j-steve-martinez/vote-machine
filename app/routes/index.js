@@ -7,6 +7,7 @@ module.exports = function (app, passport) {
 
 	function isLoggedIn (req, res, next) {
 		console.log('starting isAuthenticated');
+		console.log(req.session);
 		console.log(req.user);
 		if (req.isAuthenticated()) {
 			console.log('isAuthenticated true');

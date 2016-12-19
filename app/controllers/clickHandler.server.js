@@ -13,9 +13,17 @@ var polls = [
 
 function ClickHandler () {
 	this.getAllPolls = function(req, res){
+		Polls
+		.find()
+		.exec(function (err, polls) {
+			if (err) { throw err; }
+			console.log('clickHandler getAllPolls');
+			console.log(polls);
+			res.json(polls);
+		});
 		// mock data request from database
-		console.log('clickHandler getAllPolls');
-		res.json(polls);
+
+		// res.json(polls);
 	}
 
 	this.getUserPolls = function(req, res){

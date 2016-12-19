@@ -4,8 +4,8 @@ function BP(props){
   const polls = props.polls;
   const cb = props.cb;
   const links = polls.map((poll) =>
-    <div className="panel-body" key={poll.id.toString() }><NavLink
-              to={'/api/poll/' + poll.id}
+    <div className="panel-body" key={poll._id.toString() }><NavLink
+              to={'/api/poll/' + poll._id}
               cb={cb} >
               {poll.name}
     </NavLink></div>

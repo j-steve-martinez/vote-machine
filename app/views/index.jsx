@@ -20,15 +20,16 @@ function BP(props){
 
 function NewPollResults(props){
   let items = props.items;
-  let title = items.shift();
-  // console.log('NewPollResults');
-  // console.log(items);
-  // TODO: make sure list item is unique
-  let listItems = items.map((item, index) =>
-  // console.log(index);
-   <li key={index.toString()}>
-     {item}
-   </li>
+  let title = items[0];
+  let poll = items.filter((value, key) => {
+    if (key > 0) {
+      return value;
+    }
+  });
+  let listItems = poll.map((value, key) =>
+    <li key={key.toString()}>
+     {value}
+    </li>
   );
   return (
     <div>
@@ -80,7 +81,8 @@ class Main extends React.Component {
     console.log('Main this.state');
     console.log(this.state);
     var route, path = this.state.path;
-    // console.log(path);
+    console.log('Path: ');
+    console.log(path);
     // \/poll\/\d
     // \/profile\/\d+
     var pollRe = /\/api\/poll\/\d+/;
@@ -98,13 +100,13 @@ class Main extends React.Component {
         route = (<About />)
         break;
       case (path.match(pollRe) || {}).input:
-        route = (<Poll main={this.state}>Poll Test</Poll>)
+        route = (<Poll main={this.state} cb={this.callBack}>Poll Test</Poll>)
         break;
       case (path.match(profileNewRe) || {}).input:
-        route = (<NewPoll isAuth={this.state.isAuth} />)
+        route = (<NewPoll auth={this.state.auth} cb={this.callBack}/>)
         break;
       case (path.match(profileRe) || {}).input:
-        route = (<Profile data={this.state} />)
+        route = (<Profile data={this.state} cb={this.callBack}/>)
         console.log('Case match Profile' + path);
         break;
       default:
@@ -259,7 +261,35 @@ const NewPoll = React.createClass({
     var poll = this.state.items;
     console.log('Poll:');
     console.log(poll);
-    // this.props.router.replace('/')
+    var uid = this.props.auth.id;
+    console.log('new poll submit id: ' + uid);
+    var url = '/api/' + uid + '/new'
+    // var url = '/api/:id/new';
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(poll)
+    }).then(res => {
+      return res.json();
+    }).then(data => {
+      console.log('new poll fetch data');
+      console.log(data);
+      var url = '/api/poll/' + data.pollId;
+      this.props.cb(url);
+    });
+    // fetch(myRequest).then(res => {
+    //   return res.json();
+    // }).then(allPolls => {
+    //   var polls = {};
+    //   polls.allPolls = allPolls;
+    //   // console.log(polls);
+    //   this.setState(polls);
+    // });
+    console.log('data posted');
+    // ajaxRequest(method, url, callback);
+    // ajaxRequest('POST', '/api/', callback);
     event.preventDefault()
   },
   handleClick(event){
@@ -274,6 +304,7 @@ const NewPoll = React.createClass({
   render() {
     console.log('NewPoll');
     console.log(this.state);
+    console.log(this.props);
     if (this.state.items.length <= 0) {
       var ret = ''
     } else {
@@ -284,7 +315,7 @@ const NewPoll = React.createClass({
         <div>Enter a comma seperated list of items to poll.  The first item should be the poll title</div>
         <div>The first item should be the poll title. Example:</div>
         <code>Title, item1, item2, item3</code>
-          <form>
+          <form action='/api/1/test'>
             <textarea ref='atext'></textarea>
             <div>
               <button ref='poll' onClick={this.handleClick}>{this.state.buttonText}</button>
@@ -343,18 +374,18 @@ const Header = React.createClass({
   render() {
     console.log('header props');
     console.log(this.props);
-    var isAuth = this.props.auth;
-    // console.log('isAuth');
-    // console.log(isAuth);
+    var auth = this.props.auth;
+    // console.log('auth');
+    // console.log(auth);
     var myHeader, name;
-    isAuth.id ? name = <span className="navbar-text">Signed in as {isAuth.username}</span> : null
-    if (isAuth.id !== undefined && isAuth.id !== false ) {
+    auth.id ? name = <span className="navbar-text">Signed in as {auth.username}</span> : null
+    if (auth.id !== undefined && auth.id !== false ) {
       // console.log('is logged in');
-      // console.log(typeof isAuth);
-      myHeader = <HeaderLogout cb={this.props.cb} isAuth={isAuth}/>;
+      // console.log(typeof auth);
+      myHeader = <HeaderLogout cb={this.props.cb} auth={auth}/>;
     } else {
       // console.log('not logged in');
-      // console.log(typeof isAuth);
+      // console.log(typeof auth);
       myHeader = <HeaderLogin cb={this.props.cb}/>;
     }
     return (
@@ -393,8 +424,9 @@ const HeaderLogout = React.createClass({
   render(){
     console.log('HeaderLogout');
     console.log(this.props);
-    var profile = '/profile/' + this.props.isAuth.id;
-    var profileNew = profile + '/new';
+    var uid = this.props.auth.id;
+    var profile = '/api/profile/' + uid;
+    var profileNew = '/profile/' + uid + '/new';
     return(
       <ul className="nav navbar-nav">
         <li className="nav-item active">

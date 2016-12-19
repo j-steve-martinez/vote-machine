@@ -7,6 +7,7 @@ module.exports = function (app, passport) {
 
 	function isLoggedIn (req, res, next) {
 		console.log('starting isAuthenticated');
+		console.log(req.user);
 		if (req.isAuthenticated()) {
 			console.log('isAuthenticated true');
 			var hour = 36000000
@@ -15,7 +16,8 @@ module.exports = function (app, passport) {
 			return next();
 		}	else {
 			console.log('isAuthenticated false');
-			res.json({id: false});
+			console.log(req.url);
+			res.json({pollId: false});
 		}
 	}
 
@@ -67,15 +69,31 @@ module.exports = function (app, passport) {
 			res.json(req.user.github);
 		});
 
+	// get the user polls
+  app.route('/api/profile/:id')
+		.get(clickHandler.getUserPolls);
+
 	// to add a new poll
 	// user :id and :poll object
-	app.route('/api/:id/:poll')
-		.get(isLoggedIn, function (req, res) {
-			console.log(req.user.github);
-			var id = req.params.id;
-			var poll = req.params.poll;
-			res.json({id:id, poll:poll});
+	app.route('/api/:id/new')
+		.post(function (req, res) {
+			console.log('new poll ok');
+			console.log(req.params);
+			console.log(req.session);
+			// console.log(req);
+			req.on('data', function(chunk) {
+				console.log("Received body data:");
+				console.log(chunk.toString());
+				res.json({pollId: 1})
+			});
+			// console.log(req.user.github);
+			// console.log(req.post);
 		});
+
+	app.route('/api/profile/new')
+		.get(isLoggedIn, function(req, res){
+			console.log(req.params);
+		})
 
 	app.route('/auth/github')
 		.get(passport.authenticate('github'));
@@ -91,8 +109,4 @@ module.exports = function (app, passport) {
 		.post(isLoggedIn, clickHandler.addClick)
 		.delete(isLoggedIn, clickHandler.resetClicks);
 
-	// app.route('*').get((req, res) => {
-	// 	// res.send("Don't type in a URL\n Have A Nice Day!");
-	// 	res.redirect('/');
-	// });
 };

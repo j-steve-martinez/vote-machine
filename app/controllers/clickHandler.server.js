@@ -15,16 +15,37 @@ function ClickHandler () {
 	this.getAllPolls = function(req, res){
 		// mock data request from database
 		console.log('clickHandler getAllPolls');
-
 		res.json(polls);
 	}
 
 	this.getUserPolls = function(req, res){
-		userPolls = polls.map(poll => {
-			return poll.id === 1
+		console.log(req.auth);
+		var userPolls = polls.map(poll => {
+			console.log('clickHandler getUserPolls');
+			if (poll.uid === 1) {
+				return poll;
+			}
 		});
 		res.json(userPolls)
 	}
+
+	this.getPoll = (req, res) => {
+		console.log('getPoll');
+		// Polls
+		// 	.findOne()
+		// 	.exec((err, result) => {
+		// 		console.log('getPoll');
+		// 	});
+	}
+	this.addPoll = (req, res) => {
+		console.log(req.params);
+		// Polls
+		// 	.findOne({} (err, poll) => {
+		//
+		// 	})
+	}
+	// this.editPoll = (req, res) => {}
+	// this.deletePoll = (req, res) => {}
 
 	this.getClicks = function (req, res) {
 		Users

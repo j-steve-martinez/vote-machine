@@ -2,6 +2,13 @@
 
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+// command line mongo
+// mongo
+// db.polls.insert({"name" : "test poll c", uid:"1631314", list : [ {key : 'item1', value : 0}, {key : 'item2', value : 0} ]})
+// db.polls.find()
+
+// clear the database
+// db.polls.remove({})
 
 // uid: 1,
 // title: 'Best Thing',

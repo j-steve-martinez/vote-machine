@@ -100,7 +100,7 @@ class Main extends React.Component {
         route = (<About />)
         break;
       case (path.match(pollRe) || {}).input:
-        route = (<Poll main={this.state} cb={this.callBack}>Poll Test</Poll>)
+        route = (<Poll poll={this.state.poll} cb={this.callBack}>Poll Test</Poll>)
         break;
       case (path.match(profileNewRe) || {}).input:
         route = (<NewPoll auth={this.state.auth} cb={this.callBack}/>)
@@ -161,32 +161,63 @@ const Polls = React.createClass({
 
 const Poll = React.createClass({
   getInitialState(){
-    var mockData = {
-      uid: 1,
-      title: 'Best Thing',
-      list : [
-        {key: 'item1', value: 2},
-        {key: 'item2', value: 5},
-        {key: 'item3', value: 9}
-      ]};
+    // var mockData = {
+    //   uid: 1,
+    //   title: 'Best Thing',
+    //   list : [
+    //     {key: 'item1', value: 2},
+    //     {key: 'item2', value: 5},
+    //     {key: 'item3', value: 9}
+    //   ]};
+    var data = this.props.poll;
     return (
-      {data: mockData, message: ''}
+      {data: data, message: ''}
     )
   },
   handleSubmit(event){
     event.preventDefault();
-    var submitted = this.state.value;
-    console.log('submitted: ' + submitted);
+    var key = this.state.value;
+    console.log('key: ' + key);
 
-    if (submitted === undefined) {
+    if (key === undefined) {
       var message = 'Please make a selection'
       this.setState({message: message})
     } else {
       console.log('form select...');
-      console.log(submitted);
-
-      var data = this.state.data;
-      console.log(data);
+      console.log(key);
+      var poll = new Object(this.state.data);
+      poll.list.forEach(item => {
+        console.log(item);
+        if (item.hasOwnProperty(key)) {
+          console.log('match');
+          item[key]++;
+        }
+      });
+      console.log(poll);
+      var url = '/api/poll/' + poll._id;
+      // var myRequest = new Request(url);
+      // fetch(myRequest).then(res => {
+      //   return res.json();
+      // }).then(allPolls => {
+      //   var polls = {};
+      //   polls.allPolls = allPolls;
+      //   // console.log(polls);
+      //   this.setState(polls);
+      // });
+      fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(poll)
+      }).then(res => {
+        return res.json();
+      }).then(data => {
+        console.log('poll poll fetch data');
+        console.log(data);
+        // var url = '/api/poll/' + data.pollId;
+        // this.props.cb(url);
+      });
     }
   },
   handleChange(event){
@@ -198,13 +229,15 @@ const Poll = React.createClass({
     console.log(this.state);
     console.log(this.props);
     // var num = this.props.params.num;
-    var num = 1;
-    var title = this.state.data.title;
+    var num = this.state.data._id;
+    var title = this.state.data.name;
     var list = this.state.data.list;
     var items = list.map(function(item){
-      return item.key
+      console.log(item);
+      return Object.keys(item)
     });
-
+    // var items = Object.keys(this.state.data.list);
+    console.log(items);
     if (items[0]!== '') {
       items.unshift('')
     }

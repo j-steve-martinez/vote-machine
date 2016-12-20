@@ -21,9 +21,6 @@ function ClickHandler () {
 			console.log(polls);
 			res.json(polls);
 		});
-		// mock data request from database
-
-		// res.json(polls);
 	}
 
 	this.getUserPolls = function(req, res){
@@ -39,12 +36,36 @@ function ClickHandler () {
 
 	this.getPoll = (req, res) => {
 		console.log('getPoll');
-		// Polls
-		// 	.findOne()
-		// 	.exec((err, result) => {
-		// 		console.log('getPoll');
-		// 	});
+		console.log(req.params.id);
+		Polls
+			.findOne({'_id': req.params.id})
+			.exec((err, poll) => {
+				console.log('Poll Data');
+				console.log(poll);
+				res.json(poll)
+			});
 	}
+
+	this.editPoll = (req, res) => {
+		console.log('editPoll');
+		console.log(req.params.id);
+		req.on('data', function(chunk) {
+			console.log("Received body data:");
+			console.log(chunk.toString());
+			var data = JSON.parse(chunk.toString());
+			console.log('data list');
+			console.log(data.list);
+			var myList = data.list;
+			Polls
+				.findOneAndUpdate({'_id': req.params.id}, { $set : { list: myList }})
+				.exec((err, poll) => {
+					console.log('edited poll');
+					console.log(poll);
+					res.json(poll);
+				});
+		});
+	}
+
 	this.addPoll = (req, res) => {
 		console.log(req.params);
 		// Polls

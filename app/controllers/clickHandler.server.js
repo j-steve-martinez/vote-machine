@@ -16,14 +16,19 @@ function ClickHandler () {
 	}
 
 	this.getUserPolls = function(req, res){
-		console.log(req.auth);
-		var userPolls = polls.map(poll => {
-			console.log('clickHandler getUserPolls');
-			if (poll.uid === 1) {
-				return poll;
-			}
-		});
-		res.json(userPolls)
+		console.log(req.params.id);
+		Polls
+			.find()
+			.exec((err, data) => {
+				if (err) { throw err;	}
+				console.log('getUserPolls');
+				var polls = data.filter(poll => {
+					if (poll.uid === +req.params.id) {
+						return poll;
+					}
+				});
+				res.json(polls);
+			});
 	}
 
 	this.getPoll = (req, res) => {
@@ -73,13 +78,16 @@ function ClickHandler () {
 
 	this.addPoll = (req, res) => {
 		console.log(req.params);
+		req.on('data', function(chunk) {
+			var data = JSON.parse(chunk.toString());
+			console.log('addPoll got chunk');
+			console.log(data);
+		});
 		// Polls
 		// 	.findOne({} (err, poll) => {
 		//
 		// 	})
 	}
-	// this.editPoll = (req, res) => {}
-	// this.deletePoll = (req, res) => {}
 
 	this.getClicks = function (req, res) {
 		Users

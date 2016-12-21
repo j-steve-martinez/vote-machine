@@ -49,19 +49,6 @@ module.exports = function (app, passport) {
 	app.route('/api/poll/:id')
 		.get(clickHandler.getPoll)
 		.put(clickHandler.editPoll)
-		// .get(function (req, res) {
-		// 	console.log(req.params.id);
-		// 	var poll = {id: 1, name:'Best Mock Data'};
-		// 	var mockData = {
-		// 		uid: 1,
-		// 		title: 'Best Thing',
-		// 		list : [
-		// 			{key: 'item1', value: 2},
-		// 			{key: 'item2', value: 5},
-		// 			{key: 'item3', value: 9}
-		// 		]};
-		// 	res.json(mockData);
-		// });
 
 	// get all polls
 	app.route('/api/allPolls')
@@ -74,11 +61,10 @@ module.exports = function (app, passport) {
 		});
 
 	// get the user polls
-  app.route('/api/profile/:id')
+  app.route('/api/:id/profile')
 		.get(clickHandler.getUserPolls);
 
-	// to add a new poll
-	// user :id and :poll object
+	// to add a new user poll
 	app.route('/api/:id/new')
 		.post(function (req, res) {
 			console.log('new poll ok');
@@ -90,14 +76,7 @@ module.exports = function (app, passport) {
 				console.log(chunk.toString());
 				res.json({pollId: 1})
 			});
-			// console.log(req.user.github);
-			// console.log(req.post);
 		});
-
-	app.route('/api/profile/new')
-		.get(isLoggedIn, function(req, res){
-			console.log(req.params);
-		})
 
 	app.route('/auth/github')
 		.get(passport.authenticate('github'));

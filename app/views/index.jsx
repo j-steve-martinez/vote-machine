@@ -106,7 +106,7 @@ class Main extends React.Component {
         route = (<NewPoll auth={this.state.auth} cb={this.callBack}/>)
         break;
       case (path.match(profileRe) || {}).input:
-        route = (<Profile data={this.state} cb={this.callBack}/>)
+        route = (<Profile polls={this.state.poll} cb={this.callBack}/>)
         console.log('Case match Profile' + path);
         break;
       default:
@@ -272,11 +272,8 @@ const Profile = React.createClass({
     console.log('Profile');
     console.log(this.props);
     // var uid = this.props.params.uid;
-    return (
-      <Body title='User Profile'>
-        <div>Get a list of the user polls and put here!</div>
-      </Body>
-    )
+    return (<Polls polls={this.props.polls} cb={this.props.cb}/>);
+
   }
 
 });
@@ -307,20 +304,15 @@ const NewPoll = React.createClass({
     }).then(data => {
       console.log('new poll fetch data');
       console.log(data);
-      var url = '/api/poll/' + data.pollId;
+      // var url = '/api/poll/' + data.pollId;
+      // TODO: this should route to use polls
+      // using main as a stub for now
+      var url = '/'
       this.props.cb(url);
     });
-    // fetch(myRequest).then(res => {
-    //   return res.json();
-    // }).then(allPolls => {
-    //   var polls = {};
-    //   polls.allPolls = allPolls;
-    //   // console.log(polls);
-    //   this.setState(polls);
-    // });
+
     console.log('data posted');
-    // ajaxRequest(method, url, callback);
-    // ajaxRequest('POST', '/api/', callback);
+
     event.preventDefault()
   },
   handleClick(event){
@@ -362,34 +354,35 @@ const NewPoll = React.createClass({
 const NavLink = React.createClass({
   clickH(e){
     // e.preventDefault();
-    console.log('myClick');
+    console.log('NavLink myClick');
     console.log(e.target.id);
     // prevent default for everything except login and logout
     if (e.target.id.indexOf('log') <= 0 && e.target.id.indexOf('github') <= 0) {
       e.preventDefault();
       // if api call get data or just call the callback
       if (e.target.id.indexOf('api') !== -1) {
-        console.log('api called');
+        console.log('NavLink api called');
         this.getData(e.target.id)
       } else {
-        console.log('other called');
+        console.log('NavLink other called');
         this.props.cb(e.target.id, 'type test', 'data test');
       }
     }
   },
   getData(url){
-    // var url = '/api/allPolls'
     var myRequest = new Request(url);
     fetch(myRequest).then(res => {
       return res.json();
     }).then(data => {
-      // var polls = {};
-      // polls.allPolls = allPolls;
-      // console.log('fetch: ' + url);
-      // console.log(data);
-      // console.log('NavLink calling callBack');
-      this.props.cb(url, 'type test', data);
-      // this.setState(polls);
+      var type, urlArr = url.split('/');
+      console.log('url data');
+      console.log(urlArr);
+      if (urlArr[3] === 'profile') {
+        console.log('profile');
+        url = '/profile/' + urlArr[2];
+        type = urlArr[3];
+      }
+      this.props.cb(url, type , data);
     });
 
   },
@@ -456,7 +449,8 @@ const HeaderLogout = React.createClass({
     console.log('HeaderLogout');
     console.log(this.props);
     var uid = this.props.auth.id;
-    var profile = '/api/profile/' + uid;
+    // var profile = '/api/profile/' + uid;
+    var profile = '/api/' + uid + '/profile';
     var profileNew = '/profile/' + uid + '/new';
     return(
       <ul className="nav navbar-nav">

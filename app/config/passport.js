@@ -28,6 +28,7 @@ module.exports = function (passport) {
 				}
 
 				if (user) {
+					console.log('Passport user');
 					console.log(user);
 					return done(null, user);
 				} else {

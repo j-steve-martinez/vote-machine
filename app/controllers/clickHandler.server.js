@@ -1,11 +1,11 @@
 'use strict';
 
 var Users = require('../models/users.js');
-var Polls = require('../models/polls.js');
+var Poll = require('../models/polls.js');
 
 function ClickHandler () {
 	this.getAllPolls = function(req, res){
-		Polls
+		Poll
 		.find()
 		.exec(function (err, polls) {
 			if (err) { throw err; }
@@ -17,7 +17,7 @@ function ClickHandler () {
 
 	this.getUserPolls = function(req, res){
 		console.log(req.params.id);
-		Polls
+		Poll
 			.find()
 			.exec((err, data) => {
 				if (err) { throw err;	}
@@ -34,7 +34,7 @@ function ClickHandler () {
 	this.getPoll = (req, res) => {
 		console.log('getPoll');
 		console.log(req.params.id);
-		Polls
+		Poll
 			.findOne({'_id': req.params.id})
 			.exec((err, poll) => {
 				console.log('Poll Data');
@@ -43,7 +43,7 @@ function ClickHandler () {
 			});
 	}
 
-	this.editPoll = (req, res) => {
+	this.takePoll = (req, res) => {
 		console.log('editPoll');
 		console.log(req.params.id);
 		req.on('data', function(chunk) {
@@ -58,7 +58,7 @@ function ClickHandler () {
 			console.log(id);
 			console.log(name);
 			console.log(key);
-			Polls
+			Poll
 				.findOneAndUpdate({
 					'_id': data.id,
 					'name' : data.name,
@@ -80,22 +80,33 @@ function ClickHandler () {
 		console.log(req.params);
 		req.on('data', function(chunk) {
 			var data = JSON.parse(chunk.toString());
-			// console.log('addPoll got chunk');
-			// console.log(data);
-			var newPoll = new Polls(data);
-			console.log('newPoll');
-			console.log(newPoll);
-			// Saving it to the database.
-    	newPoll.save(function (err, data) {
+			console.log(data);
+			var name = data.name;
+			var uid = +data.uid;
+			Poll.find({name : data.name, uid : data.uid}, (err, poll) => {
 				if (err) {
-					console.log ('Error on save!');
-					res.json({isSaved : false});
+					throw err;
 				}
-				console.log('data saved');
-				console.log(data);
-				res.json({isSaved : true});
-			});
 
+				if (poll.length) {
+					console.log('sending json');
+					res.json({isExists : true, isSaved : false});
+				} else {
+					var newPoll = new Poll(data);
+					console.log('newPoll');
+					console.log(newPoll);
+					// Saving it to the database.
+					newPoll.save(function (err, data) {
+						if (err) {
+							console.log ('Error on save!');
+							res.json({isExists : false, isSaved : false});
+						}
+						console.log('data saved');
+						console.log(data);
+						res.json({isExists : false, isSaved : true, poll : data});
+					});
+				}
+			});
 		});
 	}
 

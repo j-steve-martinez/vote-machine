@@ -59,10 +59,18 @@ class Main extends React.Component {
     console.log(path);
     console.log(type);
     console.log(data);
-    var obj = {'path': path, 'poll': data}
-    this.setState(obj);
+    if (type === 'new') {
+      var allPolls = this.state.allPolls;
+      allPolls.push(data.poll);
+      var obj = {'path': path, 'poll': data, allPolls : allPolls};
+    } else {
+      var obj = {'path': path, 'poll': data};
+    }
+
+    this.setState(obj)
   }
   componentDidMount(){
+    console.log('Main componentDidMount');
     this.getAllPolls();
   }
   getAllPolls(){
@@ -73,7 +81,7 @@ class Main extends React.Component {
     }).then(allPolls => {
       var polls = {};
       polls.allPolls = allPolls;
-      // console.log(polls);
+      console.log(polls);
       this.setState(polls);
     });
   }
@@ -282,26 +290,27 @@ const NewPoll = React.createClass({
   getInitialState() {
     return {
       items: [],
-      buttonText : 'Create'
+      buttonText : 'Create',
+      message : ''
     }
   },
   handleSubmit(event){
     event.preventDefault();
-    var uid,poll,name, list = [];
+    var message,uid,poll,name, list = [];
     uid = this.props.auth.id;
     this.state.items.forEach((value, key) => {
       var obj = {key : value, value : 0};
       key === 0 ? name = value : list.push(obj);
     });
-    console.log(name);
-    console.log(list);
-    console.log(uid);
+    // console.log(name);
+    // console.log(list);
+    // console.log(uid);
     poll = {name : name, uid : uid, list : list}
 
-    console.log('Poll:');
+    console.log('Sending Poll:');
     console.log(poll);
 
-    console.log('new poll submit id: ' + uid);
+    // console.log('new poll submit id: ' + uid);
     var url = '/api/' + uid + '/new'
     // var url = '/api/:id/new';
     fetch(url, {
@@ -315,11 +324,23 @@ const NewPoll = React.createClass({
     }).then(data => {
       console.log('new poll fetch data');
       console.log(data);
-      // var url = '/api/poll/' + data.pollId;
-      // TODO: this should route to use polls
-      // using main as a stub for now
-      var url = '/'
-      // this.props.cb(url);
+      if (data.isExists) {
+        message = "Poll Name Already Taken!";
+        this.setState({message : message});
+      } else {
+        if (data.isSaved) {
+          // var url = '/api/poll/' + data.pollId;
+          // TODO: this should route to use polls
+          // using main as a stub for now
+          // var url = '/profile/' + uid;
+          var url = '/';
+          this.props.cb(url, 'new', data);
+        } else {
+          message = "Error saving data";
+          this.setState({message : message});
+        }
+      }
+
     });
 
     console.log('data posted');
@@ -328,10 +349,10 @@ const NewPoll = React.createClass({
   },
   handleClick(event){
     const text = this.refs.atext.value;
-    // console.log('form text...');
-    // console.log(text);
+    console.log('form text...');
+    console.log(text);
     let items = text.split(',');
-    // console.log(items);
+    console.log(items);
     this.setState({items: items, buttonText: 'Update'})
     event.preventDefault()
   },
@@ -349,6 +370,7 @@ const NewPoll = React.createClass({
         <div>Enter a comma seperated list of items to poll.  The first item should be the poll title</div>
         <div>The first item should be the poll title. Example:</div>
         <code>Title, item1, item2, item3</code>
+        <h4>{this.state.message}</h4>
           <form >
             <textarea ref='atext'></textarea>
             <div>

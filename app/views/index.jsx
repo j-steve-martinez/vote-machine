@@ -161,62 +161,41 @@ const Polls = React.createClass({
 
 const Poll = React.createClass({
   getInitialState(){
-    // var mockData = {
-    //   uid: 1,
-    //   title: 'Best Thing',
-    //   list : [
-    //     {key: 'item1', value: 2},
-    //     {key: 'item2', value: 5},
-    //     {key: 'item3', value: 9}
-    //   ]};
-    var data = this.props.poll;
+    var poll = this.props.poll;
     return (
-      {data: data, message: ''}
+      {poll: poll, message: ''}
     )
   },
   handleSubmit(event){
     event.preventDefault();
-    var key = this.state.value;
-    console.log('key: ' + key);
+    var submitted = this.state.value;
+    console.log('submitted: ' + submitted);
 
-    if (key === undefined) {
+    if (submitted === undefined) {
       var message = 'Please make a selection'
       this.setState({message: message})
     } else {
       console.log('form select...');
-      console.log(key);
-      var poll = new Object(this.state.data);
-      poll.list.forEach(item => {
-        console.log(item);
-        if (item.hasOwnProperty(key)) {
-          console.log('match');
-          item[key]++;
-        }
-      });
-      console.log(poll);
-      var url = '/api/poll/' + poll._id;
-      // var myRequest = new Request(url);
-      // fetch(myRequest).then(res => {
-      //   return res.json();
-      // }).then(allPolls => {
-      //   var polls = {};
-      //   polls.allPolls = allPolls;
-      //   // console.log(polls);
-      //   this.setState(polls);
-      // });
+      console.log(submitted);
+      var results = {
+        id : this.state.poll._id,
+        name : this.state.poll.name,
+        key : submitted
+      }
+      console.log(results);
+      var url = '/api/poll/' + results.id;
       fetch(url, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(poll)
+        body: JSON.stringify(results)
       }).then(res => {
         return res.json();
       }).then(data => {
         console.log('poll poll fetch data');
         console.log(data);
-        // var url = '/api/poll/' + data.pollId;
-        // this.props.cb(url);
+        this.setState({poll : data, message : 'results'})
       });
     }
   },
@@ -225,41 +204,44 @@ const Poll = React.createClass({
     this.setState({value: event.target.value});
   },
   render(){
-    console.log('Poll');
+    console.log('Poll state');
     console.log(this.state);
+    console.log('Poll props');
     console.log(this.props);
     // var num = this.props.params.num;
-    var num = this.state.data._id;
-    var title = this.state.data.name;
-    var list = this.state.data.list;
+    var num = 1;
+    var name = this.state.poll.name;
+    var list = this.state.poll.list;
     var items = list.map(function(item){
-      console.log(item);
-      return Object.keys(item)
+      return item.key
     });
-    // var items = Object.keys(this.state.data.list);
-    console.log(items);
+    // pad a blank in the list
     if (items[0]!== '') {
       items.unshift('')
     }
 
-    const myOptions = items.map((item, index) =>
-     <option ref={item} key={index} value={item}>
-       {item}
-     </option>
-    );
-    var form =
-      (<Body title={title}>
-        <div>ID: {num}</div>
-        <form onSubmit={this.handleSubmit}>
-          <select value={this.state.value} onChange={this.handleChange}>
-            {myOptions}
-          </select>
-          <div>
-            <button type="submit">Submit</button>
-          </div>
-        </form>
-        {this.state.message}
-      </Body>)
+    if (this.state.message === 'results') {
+      var form = <PollResults poll={this.state.poll} cb={this.props.cb}/>
+    } else {
+      const myOptions = items.map((item, index) =>
+       <option ref={item} key={index} value={item}>
+         {item}
+       </option>
+      );
+      var form =
+        (<Body title={name}>
+          <div>ID: {num}</div>
+          <form onSubmit={this.handleSubmit}>
+            <select value={this.state.value} onChange={this.handleChange}>
+              {myOptions}
+            </select>
+            <div>
+              <button type="submit">Submit</button>
+            </div>
+          </form>
+          {this.state.message}
+        </Body>)
+    }
 
     return (
       <div>
@@ -268,6 +250,22 @@ const Poll = React.createClass({
     )
   }
 })
+
+const PollResults = React.createClass({
+  render(){
+    console.log('Poll Results');
+    console.log(this.props);
+    var items = this.props.poll.list.map((data, key) => {
+      return (<div key={key}>
+        {data.key} : {data.value}
+      </div>)
+    })
+    console.log('list');
+    console.log(items);
+    // var poll = this.props.poll
+    return (<Body title={this.props.poll.name}>{items}</Body>);
+  }
+});
 
 const Profile = React.createClass({
   render() {

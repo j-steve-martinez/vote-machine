@@ -2,14 +2,6 @@
 
 var Users = require('../models/users.js');
 var Polls = require('../models/polls.js');
-// mock data
-var polls = [
-	{id: 1, uid: 1, name:'Best This'},
-	{id: 2, uid: 2, name:'Is That Good'},
-	{id: 3, uid: 1, name:'Is it Bad'},
-	{id: 4, uid: 2, name:'Are you That Good'},
-	{id: 5, uid: 1, name:'Is That Really Good'}
-];
 
 function ClickHandler () {
 	this.getAllPolls = function(req, res){
@@ -54,10 +46,23 @@ function ClickHandler () {
 			console.log(chunk.toString());
 			var data = JSON.parse(chunk.toString());
 			console.log('data list');
-			console.log(data.list);
-			var myList = data.list;
+			console.log(data);
+			var id = data.id;
+			var name = data.name;
+			var key = data.key;
+			console.log(id);
+			console.log(name);
+			console.log(key);
 			Polls
-				.findOneAndUpdate({'_id': req.params.id}, { $set : { list: myList }})
+				.findOneAndUpdate({
+					'_id': data.id,
+					'name' : data.name,
+					'list.key' : data.key
+				},
+					{ $inc : { 'list.$.value': 1 }},
+					// get the update poll
+					{ new: true }
+				)
 				.exec((err, poll) => {
 					console.log('edited poll');
 					console.log(poll);

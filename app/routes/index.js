@@ -66,17 +66,19 @@ module.exports = function (app, passport) {
 
 	// to add a new user poll
 	app.route('/api/:id/new')
-		.post(function (req, res) {
-			console.log('new poll ok');
-			console.log(req.params);
-			console.log(req.session);
-			// console.log(req);
-			req.on('data', function(chunk) {
-				console.log("Received body data:");
-				console.log(chunk.toString());
-				res.json({pollId: 1})
-			});
-		});
+		.post(clickHandler.addUserPoll);
+		// .post(function (req, res) {
+		// 	console.log('new poll ok');
+		// 	console.log(req.params);
+		// 	console.log(req.session);
+		// 	// console.log(req);
+		// 	req.on('data', function(chunk) {
+		// 		console.log("Received body data:");
+		// 		console.log(chunk.toString());
+		// 		res.post()
+		// 		res.json({pollId: 1})
+		// 	});
+		// });
 
 	app.route('/auth/github')
 		.get(passport.authenticate('github'));

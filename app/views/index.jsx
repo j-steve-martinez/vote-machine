@@ -286,10 +286,21 @@ const NewPoll = React.createClass({
     }
   },
   handleSubmit(event){
-    var poll = this.state.items;
+    event.preventDefault();
+    var uid,poll,name, list = [];
+    uid = this.props.auth.id;
+    this.state.items.forEach((value, key) => {
+      var obj = {key : value, value : 0};
+      key === 0 ? name = value : list.push(obj);
+    });
+    console.log(name);
+    console.log(list);
+    console.log(uid);
+    poll = {name : name, uid : uid, list : list}
+
     console.log('Poll:');
     console.log(poll);
-    var uid = this.props.auth.id;
+
     console.log('new poll submit id: ' + uid);
     var url = '/api/' + uid + '/new'
     // var url = '/api/:id/new';
@@ -308,12 +319,12 @@ const NewPoll = React.createClass({
       // TODO: this should route to use polls
       // using main as a stub for now
       var url = '/'
-      this.props.cb(url);
+      // this.props.cb(url);
     });
 
     console.log('data posted');
 
-    event.preventDefault()
+
   },
   handleClick(event){
     const text = this.refs.atext.value;
@@ -338,7 +349,7 @@ const NewPoll = React.createClass({
         <div>Enter a comma seperated list of items to poll.  The first item should be the poll title</div>
         <div>The first item should be the poll title. Example:</div>
         <code>Title, item1, item2, item3</code>
-          <form action='/api/1/test'>
+          <form >
             <textarea ref='atext'></textarea>
             <div>
               <button ref='poll' onClick={this.handleClick}>{this.state.buttonText}</button>

@@ -76,17 +76,27 @@ function ClickHandler () {
 		});
 	}
 
-	this.addPoll = (req, res) => {
+	this.addUserPoll = (req, res) => {
 		console.log(req.params);
 		req.on('data', function(chunk) {
 			var data = JSON.parse(chunk.toString());
-			console.log('addPoll got chunk');
-			console.log(data);
+			// console.log('addPoll got chunk');
+			// console.log(data);
+			var newPoll = new Polls(data);
+			console.log('newPoll');
+			console.log(newPoll);
+			// Saving it to the database.
+    	newPoll.save(function (err, data) {
+				if (err) {
+					console.log ('Error on save!');
+					res.json({isSaved : false});
+				}
+				console.log('data saved');
+				console.log(data);
+				res.json({isSaved : true});
+			});
+
 		});
-		// Polls
-		// 	.findOne({} (err, poll) => {
-		//
-		// 	})
 	}
 
 	this.getClicks = function (req, res) {

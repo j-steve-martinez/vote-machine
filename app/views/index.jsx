@@ -108,7 +108,7 @@ class Main extends React.Component {
         route = (<About />)
         break;
       case (path.match(pollRe) || {}).input:
-        route = (<Poll poll={this.state.poll} cb={this.callBack}>Poll Test</Poll>)
+        route = (<Poll auth={this.state.auth} poll={this.state.poll} cb={this.callBack}>Poll Test</Poll>)
         break;
       case (path.match(profileNewRe) || {}).input:
         route = (<NewPoll auth={this.state.auth} cb={this.callBack}/>)
@@ -216,10 +216,13 @@ const Poll = React.createClass({
     console.log(this.state);
     console.log('Poll props');
     console.log(this.props);
-    // var num = this.props.params.num;
-    var num = 1;
+
     var name = this.state.poll.name;
     var list = this.state.poll.list;
+    var auth = this.props.auth;
+    console.log('auth');
+    console.log(auth);
+    console.log(auth.id);
     var items = list.map(function(item){
       return item.key
     });
@@ -231,6 +234,22 @@ const Poll = React.createClass({
     if (this.state.message === 'results') {
       var form = <PollResults poll={this.state.poll} cb={this.props.cb}/>
     } else {
+      if (auth.id === false) {
+        console.log('auth false');
+        var del = null;
+      } else {
+        console.log('auth true');
+        var del = (
+          <div>
+            <div>
+              <button className='btn btn-warning btn-sm' type='button' name='edit'>Edit</button>
+            </div>
+            <div>
+              <button className='btn btn-danger btn-sm'  type='button' name='delete'>Delete</button>
+            </div>
+          </div>
+        );
+      }
       const myOptions = items.map((item, index) =>
        <option ref={item} key={index} value={item}>
          {item}
@@ -238,15 +257,15 @@ const Poll = React.createClass({
       );
       var form =
         (<Body title={name}>
-          <div>ID: {num}</div>
           <form onSubmit={this.handleSubmit}>
             <select value={this.state.value} onChange={this.handleChange}>
               {myOptions}
             </select>
             <div>
-              <button type="submit">Submit</button>
+              <button className='btn btn-success btn-sm' type='button' type="submit">Submit</button>
             </div>
           </form>
+          {del}
           {this.state.message}
         </Body>)
     }
@@ -329,10 +348,6 @@ const NewPoll = React.createClass({
         this.setState({message : message});
       } else {
         if (data.isSaved) {
-          // var url = '/api/poll/' + data.pollId;
-          // TODO: this should route to use polls
-          // using main as a stub for now
-          // var url = '/profile/' + uid;
           var url = '/';
           this.props.cb(url, 'new', data);
         } else {

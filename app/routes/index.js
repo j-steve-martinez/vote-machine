@@ -18,7 +18,7 @@ module.exports = function (app, passport) {
 		}	else {
 			console.log('isAuthenticated false');
 			console.log(req.url);
-			res.json({pollId: false});
+			res.json({id: false});
 		}
 	}
 

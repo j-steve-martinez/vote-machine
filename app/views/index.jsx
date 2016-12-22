@@ -1,5 +1,14 @@
 'use strict'
 
+//* User Story: As an authenticated user, I can keep my polls and come back later to access them.
+// User Story: As an authenticated user, I can share my polls with my friends.
+// User Story: As an authenticated user, I can see the aggregate results of my polls.
+// User Story: As an authenticated user, I can delete polls that I decide I don't want anymore.
+//* User Story: As an authenticated user, I can create a poll with any number of possible items.
+//* User Story: As an unauthenticated or authenticated user, I can see and vote on everyone's polls.
+// User Story: As an unauthenticated or authenticated user, I can see the results of polls in chart form. (This could be implemented using Chart.js or Google Charts.)
+// User Story: As an authenticated user, if I don't like the options on a poll, I can create a new option.
+
 function BP(props){
   const polls = props.polls;
   const cb = props.cb;
@@ -55,10 +64,10 @@ class Main extends React.Component {
     this.state = {auth, allPolls, path : path};
   }
   callBack(path, type, data){
-    console.log('Main callBack called');
-    console.log(path);
-    console.log(type);
-    console.log(data);
+    // console.log('Main callBack called');
+    // console.log(path);
+    // console.log(type);
+    // console.log(data);
     if (type === 'new') {
       var allPolls = this.state.allPolls;
       allPolls.push(data.poll);
@@ -70,7 +79,7 @@ class Main extends React.Component {
     this.setState(obj)
   }
   componentDidMount(){
-    console.log('Main componentDidMount');
+    // console.log('Main componentDidMount');
     this.getAllPolls();
   }
   getAllPolls(){
@@ -81,28 +90,23 @@ class Main extends React.Component {
     }).then(allPolls => {
       var polls = {};
       polls.allPolls = allPolls;
-      console.log(polls);
+      // console.log(polls);
       this.setState(polls);
     });
   }
   render(){
-    console.log('Main this.state');
-    console.log(this.state);
+    // console.log('Main this.state');
+    // console.log(this.state);
     var route, path = this.state.path;
-    console.log('Path: ');
-    console.log(path);
-    // \/poll\/\d
-    // \/profile\/\d+
+    // console.log('Path: ');
+    // console.log(path);
     var pollRe = /\/api\/poll\/\d+/;
     var profileRe = /\/profile\/\d+/;
     var profileNewRe = /\/profile\/\d+\/new/;
 
-    // console.log(path.match(pollRe));
-    // console.log(path.match(profileRe));
-
     switch (path) {
       case '/':
-        route =(<Polls polls={this.state.allPolls} cb={this.callBack}/>)
+        route =(<Polls title="The Polls Are Open" polls={this.state.allPolls} cb={this.callBack}/>)
         break;
       case '/about':
         route = (<About />)
@@ -115,7 +119,6 @@ class Main extends React.Component {
         break;
       case (path.match(profileRe) || {}).input:
         route = (<Profile polls={this.state.poll} cb={this.callBack}/>)
-        console.log('Case match Profile' + path);
         break;
       default:
         route = (<Body title='Default Route'>Route not Found</Body>)
@@ -149,13 +152,11 @@ const Body = React.createClass({
 
 const Polls = React.createClass({
   render(){
-    console.log('Polls');
-    console.log(this.props);
+    // console.log('Polls');
+    // console.log(this.props);
     var bodyPanels = BP(this.props);
-    // console.log('panelBody');
-    // console.log(bodyPanels);
     return(
-      <Body title="The Polls Are Open">
+      <Body title={this.props.title}>
         <div className="panel panel-primary">
             <div className="panel-heading">
                 <h3 className="panel-title">Select a poll to cast your vote</h3>
@@ -177,20 +178,20 @@ const Poll = React.createClass({
   handleSubmit(event){
     event.preventDefault();
     var submitted = this.state.value;
-    console.log('submitted: ' + submitted);
+    // console.log('submitted: ' + submitted);
 
     if (submitted === undefined) {
       var message = 'Please make a selection'
       this.setState({message: message})
     } else {
-      console.log('form select...');
-      console.log(submitted);
+      // console.log('form select...');
+      // console.log(submitted);
       var results = {
         id : this.state.poll._id,
         name : this.state.poll.name,
         key : submitted
       }
-      console.log(results);
+      // console.log(results);
       var url = '/api/poll/' + results.id;
       fetch(url, {
         method: 'PUT',
@@ -201,28 +202,28 @@ const Poll = React.createClass({
       }).then(res => {
         return res.json();
       }).then(data => {
-        console.log('poll poll fetch data');
-        console.log(data);
+        // console.log('poll poll fetch data');
+        // console.log(data);
         this.setState({poll : data, message : 'results'})
       });
     }
   },
   handleChange(event){
-    console.log('value: ' + event.target.value);
+    // console.log('value: ' + event.target.value);
     this.setState({value: event.target.value});
   },
   render(){
-    console.log('Poll state');
-    console.log(this.state);
-    console.log('Poll props');
-    console.log(this.props);
+    // console.log('Poll state');
+    // console.log(this.state);
+    // console.log('Poll props');
+    // console.log(this.props);
 
     var name = this.state.poll.name;
     var list = this.state.poll.list;
     var auth = this.props.auth;
-    console.log('auth');
-    console.log(auth);
-    console.log(auth.id);
+    // console.log('auth');
+    // console.log(auth);
+    // console.log(auth.id);
     var items = list.map(function(item){
       return item.key
     });
@@ -235,10 +236,10 @@ const Poll = React.createClass({
       var form = <PollResults poll={this.state.poll} cb={this.props.cb}/>
     } else {
       if (auth.id === false) {
-        console.log('auth false');
+        // console.log('auth false');
         var del = null;
       } else {
-        console.log('auth true');
+        // console.log('auth true');
         var del = (
           <div>
             <div>
@@ -257,16 +258,14 @@ const Poll = React.createClass({
       );
       var form =
         (<Body title={name}>
-          <form onSubmit={this.handleSubmit}>
-            <select value={this.state.value} onChange={this.handleChange}>
+          <form className="form-group" onSubmit={this.handleSubmit}>
+            <select className="form-control" id="take-poll" value={this.state.value} onChange={this.handleChange}>
               {myOptions}
             </select>
-            <div>
-              <button className='btn btn-success btn-sm' type='button' type="submit">Submit</button>
-            </div>
+            <button className='btn btn-success btn-sm' type='button' type="submit">Submit</button>
           </form>
           {del}
-          {this.state.message}
+          <h3>{this.state.message}</h3>
         </Body>)
     }
 
@@ -280,15 +279,15 @@ const Poll = React.createClass({
 
 const PollResults = React.createClass({
   render(){
-    console.log('Poll Results');
-    console.log(this.props);
+    // console.log('Poll Results');
+    // console.log(this.props);
     var items = this.props.poll.list.map((data, key) => {
       return (<div key={key}>
         {data.key} : {data.value}
       </div>)
     })
-    console.log('list');
-    console.log(items);
+    // console.log('list');
+    // console.log(items);
     // var poll = this.props.poll
     return (<Body title={this.props.poll.name}>{items}</Body>);
   }
@@ -296,10 +295,10 @@ const PollResults = React.createClass({
 
 const Profile = React.createClass({
   render() {
-    console.log('Profile');
-    console.log(this.props);
+    // console.log('Profile');
+    // console.log(this.props);
     // var uid = this.props.params.uid;
-    return (<Polls polls={this.props.polls} cb={this.props.cb}/>);
+    return (<Polls title="These Are Your Polls" polls={this.props.polls} cb={this.props.cb}/>);
 
   }
 
@@ -326,8 +325,8 @@ const NewPoll = React.createClass({
     // console.log(uid);
     poll = {name : name, uid : uid, list : list}
 
-    console.log('Sending Poll:');
-    console.log(poll);
+    // console.log('Sending Poll:');
+    // console.log(poll);
 
     // console.log('new poll submit id: ' + uid);
     var url = '/api/' + uid + '/new'
@@ -341,8 +340,8 @@ const NewPoll = React.createClass({
     }).then(res => {
       return res.json();
     }).then(data => {
-      console.log('new poll fetch data');
-      console.log(data);
+      // console.log('new poll fetch data');
+      // console.log(data);
       if (data.isExists) {
         message = "Poll Name Already Taken!";
         this.setState({message : message});
@@ -358,23 +357,21 @@ const NewPoll = React.createClass({
 
     });
 
-    console.log('data posted');
-
-
+    // console.log('data posted');
   },
   handleClick(event){
     const text = this.refs.atext.value;
-    console.log('form text...');
-    console.log(text);
+    // console.log('form text...');
+    // console.log(text);
     let items = text.split(',');
-    console.log(items);
+    // console.log(items);
     this.setState({items: items, buttonText: 'Update'})
     event.preventDefault()
   },
   render() {
-    console.log('NewPoll');
-    console.log(this.state);
-    console.log(this.props);
+    // console.log('NewPoll');
+    // console.log(this.state);
+    // console.log(this.props);
     if (this.state.items.length <= 0) {
       var ret = ''
     } else {
@@ -402,17 +399,17 @@ const NewPoll = React.createClass({
 const NavLink = React.createClass({
   clickH(e){
     // e.preventDefault();
-    console.log('NavLink myClick');
-    console.log(e.target.id);
+    // console.log('NavLink myClick');
+    // console.log(e.target.id);
     // prevent default for everything except login and logout
     if (e.target.id.indexOf('log') <= 0 && e.target.id.indexOf('github') <= 0) {
       e.preventDefault();
       // if api call get data or just call the callback
       if (e.target.id.indexOf('api') !== -1) {
-        console.log('NavLink api called');
+        // console.log('NavLink api called');
         this.getData(e.target.id)
       } else {
-        console.log('NavLink other called');
+        // console.log('NavLink other called');
         this.props.cb(e.target.id, 'type test', 'data test');
       }
     }
@@ -423,10 +420,10 @@ const NavLink = React.createClass({
       return res.json();
     }).then(data => {
       var type, urlArr = url.split('/');
-      console.log('url data');
-      console.log(urlArr);
+      // console.log('url data');
+      // console.log(urlArr);
       if (urlArr[3] === 'profile') {
-        console.log('profile');
+        // console.log('profile');
         url = '/profile/' + urlArr[2];
         type = urlArr[3];
       }
@@ -444,8 +441,8 @@ const NavLink = React.createClass({
 
 const Header = React.createClass({
   render() {
-    console.log('header props');
-    console.log(this.props);
+    // console.log('header props');
+    // console.log(this.props);
     var auth = this.props.auth;
     // console.log('auth');
     // console.log(auth);
@@ -494,8 +491,8 @@ const HeaderLogin = React.createClass({
 
 const HeaderLogout = React.createClass({
   render(){
-    console.log('HeaderLogout');
-    console.log(this.props);
+    // console.log('HeaderLogout');
+    // console.log(this.props);
     var uid = this.props.auth.id;
     // var profile = '/api/profile/' + uid;
     var profile = '/api/' + uid + '/profile';
@@ -509,7 +506,7 @@ const HeaderLogout = React.createClass({
           <NavLink cb={this.props.cb} cn='nav-link' to={profileNew}>New Poll</NavLink>
         </li>
         <li className="nav-item">
-          <NavLink cb={this.props.cb} cn='nav-link' to={profile}>Profile</NavLink>
+          <NavLink cb={this.props.cb} cn='nav-link' to={profile}>My Polls</NavLink>
         </li>
         <li className="nav-item">
           <NavLink cb={this.props.cb} cn='nav-link' to="/logout">Logout</NavLink>

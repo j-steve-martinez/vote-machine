@@ -20,7 +20,7 @@ app.use('/views', express.static(process.cwd() + '/app/views'));
 
 app.use(session({
 	secret: 'secretClementine',
-	resave: false,
+	resave: true,
 	saveUninitialized: true
 }));
 

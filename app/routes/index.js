@@ -57,7 +57,16 @@ module.exports = function (app, passport) {
 	// get user info
 	app.route('/api/:id')
 		.get(isLoggedIn, function (req, res) {
-			res.json(req.user.github);
+			console.log('/api/:id');
+			console.log('twitter');
+			console.log(req.user.twitter.id);
+			console.log('github');
+			console.log(req.user.github.id);
+			if (req.user.twitter.id !== undefined) {
+				res.json(req.user.twitter)
+			} else if (req.user.github.id !== undefined) {
+				res.json(req.user.github);
+			}
 		});
 
 	// get the user polls
@@ -68,12 +77,20 @@ module.exports = function (app, passport) {
 	app.route('/api/:id/new')
 		.post(clickHandler.addUserPoll);
 
-
 	app.route('/auth/github')
 		.get(passport.authenticate('github'));
 
 	app.route('/auth/github/callback')
 		.get(passport.authenticate('github', {
+			successRedirect: '/',
+			failureRedirect: '/'
+		}));
+
+	app.route('/auth/twitter')
+		.get(passport.authenticate('twitter'));
+
+	app.route('/auth/twitter/callback')
+		.get(passport.authenticate('twitter', {
 			successRedirect: '/',
 			failureRedirect: '/'
 		}));

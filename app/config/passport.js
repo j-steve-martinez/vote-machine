@@ -1,6 +1,7 @@
 'use strict';
 
 var GitHubStrategy = require('passport-github').Strategy;
+var TwitterStrategy = require('passport-twitter').Strategy;
 var User = require('../models/users');
 var configAuth = require('./auth');
 
@@ -14,6 +15,50 @@ module.exports = function (passport) {
 			done(err, user);
 		});
 	});
+
+	passport.use(new TwitterStrategy({
+	    consumerKey: configAuth.twitterAuth.clientID,
+	    consumerSecret: configAuth.twitterAuth.clientSecret,
+	    callbackURL: configAuth.twitterAuth.callbackURL
+	  },
+	  function(token, tokenSecret, profile, done) {
+	    User.findOne({ twitterId: profile.id }, function (err, user) {
+				console.log('user');
+				console.log(user);
+				if (err) {
+					return done(err);
+				}
+
+				if (user) {
+					console.log('Passport user');
+					console.log(user);
+					return done(null, user);
+				} else {
+					var newUser = new User();
+					console.log('twitter profile');
+					console.log('id');
+					console.log(profile.id);
+					console.log('name');
+					console.log(profile.username);
+					console.log('display name');
+					console.log(profile.displayName);
+					newUser.twitter.id = profile.id;
+					newUser.twitter.username = profile.username;
+					newUser.twitter.displayName = profile.displayName;
+					// newUser.github.publicRepos = profile._json.public_repos;
+					newUser.nbrClicks.clicks = 0;
+
+					newUser.save(function (err) {
+						if (err) {
+							throw err;
+						}
+
+						return done(null, newUser);
+					});
+				}
+	    });
+	  }
+	));
 
 	passport.use(new GitHubStrategy({
 		clientID: configAuth.githubAuth.clientID,

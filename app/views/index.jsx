@@ -52,8 +52,8 @@ function NewPollResults(props){
 class Main extends React.Component {
   constructor(props) {
     super(props);
-    // console.log('auth');
-    // console.log(auth);
+    console.log('auth');
+    console.log(auth);
     // this.getAllPolls();
     this.callBack = this.callBack.bind(this);
     if (auth === undefined) {
@@ -400,9 +400,9 @@ const NavLink = React.createClass({
   clickH(e){
     // e.preventDefault();
     // console.log('NavLink myClick');
-    // console.log(e.target.id);
+    console.log(e.target.id);
     // prevent default for everything except login and logout
-    if (e.target.id.indexOf('log') <= 0 && e.target.id.indexOf('github') <= 0) {
+    if (e.target.id.indexOf('log') <= 0 && e.target.id.indexOf('auth') <= 0) {
       e.preventDefault();
       // if api call get data or just call the callback
       if (e.target.id.indexOf('api') !== -1) {
@@ -480,6 +480,9 @@ const HeaderLogin = React.createClass({
         </li>
         <li className="nav-item">
           <NavLink cb={this.props.cb} cn='nav-link' to="/auth/github">Login with GitHub</NavLink>
+        </li>
+        <li className="nav-item">
+          <NavLink cb={this.props.cb} cn='nav-link' to="/auth/twitter">Login with Twitter</NavLink>
         </li>
         <li className="nav-item">
           <NavLink cb={this.props.cb} cn='nav-link' to="/about">About</NavLink>

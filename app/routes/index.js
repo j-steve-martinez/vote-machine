@@ -2,6 +2,7 @@
 
 var path = process.cwd();
 var ClickHandler = require(path + '/app/controllers/clickHandler.server.js');
+var index = path + '/public/index.html';
 
 module.exports = function (app, passport) {
 
@@ -26,7 +27,8 @@ module.exports = function (app, passport) {
 
 	app.route('/')
 		.get(function (req, res) {
-			res.sendFile(path + '/public/index.html');
+			console.log(req.params);
+			res.sendFile(index);
 		});
 
 	app.route('/login')
@@ -40,10 +42,11 @@ module.exports = function (app, passport) {
 			res.redirect('/');
 		});
 
-	app.route('/profile')
-		.get(isLoggedIn, function (req, res) {
-			res.sendFile(path + '/public/profile.html');
-		});
+	app.route('/poll/:id')
+		.get((req, res) => {
+			console.log(req.params.id);
+			res.sendFile(path + '/public/poll.html');
+		})
 
 	// get the poll data
 	app.route('/api/poll/:id')

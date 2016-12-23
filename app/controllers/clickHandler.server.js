@@ -37,6 +37,7 @@ function ClickHandler () {
 		Poll
 			.findOne({'_id': req.params.id})
 			.exec((err, poll) => {
+				console.log(req.url);
 				// console.log('Poll Data');
 				// console.log(poll);
 				res.json(poll)

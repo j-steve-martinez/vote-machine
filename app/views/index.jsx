@@ -49,19 +49,32 @@ function NewPollResults(props){
   );
 }
 
+function getQueryVariable(variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split('&');
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split('=');
+        if (decodeURIComponent(pair[0]) == variable) {
+            return decodeURIComponent(pair[1]);
+        }
+    }
+    console.log('Query variable %s not found', variable);
+}
+
 class Main extends React.Component {
   constructor(props) {
     super(props);
-    console.log('auth');
-    console.log(auth);
-    // this.getAllPolls();
+    // console.log('auth');
+    // console.log(auth);
+    var pollId = getQueryVariable('poll');
+
     this.callBack = this.callBack.bind(this);
     if (auth === undefined) {
       auth = {id: false};
     }
     var allPolls = [];
     var path = '/';
-    this.state = {auth, allPolls, path : path};
+    this.state = {auth, allPolls, path : path, pollId : pollId};
   }
   callBack(path, type, data){
     // console.log('Main callBack called');
@@ -101,8 +114,30 @@ class Main extends React.Component {
     // console.log('Path: ');
     // console.log(path);
     var pollRe = /\/api\/poll\/\d+/;
+
     var profileRe = /\/profile\/\d+/;
     var profileNewRe = /\/profile\/\d+\/new/;
+    // http://localhost:8080/?poll=585c1507467e68331b82eedb
+    if (this.state.poll === undefined) {
+      if (this.state.pollId !== undefined) {
+        if (this.state.allPolls.length > 0) {
+          var tmp = this.state.allPolls.filter(item => {
+            // console.log('item');
+            // console.log(item._id);
+            if (item._id === this.state.pollId.toString()) {
+              return item;
+            }
+          });
+          var poll = tmp[0];
+          path = '/api/poll/' + poll._id;
+        }
+      }
+    } else {
+      // console.log('this.state.poll');
+      var poll = this.state.poll;
+    }
+    // console.log('using poll');
+    // console.log(poll);
 
     switch (path) {
       case '/':
@@ -112,7 +147,7 @@ class Main extends React.Component {
         route = (<About />)
         break;
       case (path.match(pollRe) || {}).input:
-        route = (<Poll auth={this.state.auth} poll={this.state.poll} cb={this.callBack}>Poll Test</Poll>)
+        route = (<Poll auth={this.state.auth} poll={poll} cb={this.callBack}>Poll Test</Poll>)
         break;
       case (path.match(profileNewRe) || {}).input:
         route = (<NewPoll auth={this.state.auth} cb={this.callBack}/>)
@@ -477,9 +512,6 @@ const HeaderLogin = React.createClass({
       <ul className="nav navbar-nav">
         <li className="nav-item active">
           <NavLink cb={this.props.cb} cn='nav-link' to="/">Home</NavLink>
-        </li>
-        <li className="nav-item">
-          <NavLink cb={this.props.cb} cn='nav-link' to="/auth/github">Login with GitHub</NavLink>
         </li>
         <li className="nav-item">
           <NavLink cb={this.props.cb} cn='nav-link' to="/auth/twitter">Login with Twitter</NavLink>

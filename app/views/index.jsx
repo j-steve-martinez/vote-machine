@@ -1,12 +1,13 @@
 'use strict'
 
 //* User Story: As an authenticated user, I can keep my polls and come back later to access them.
-// User Story: As an authenticated user, I can share my polls with my friends.
+//* User Story: As an authenticated user, I can share my polls with my friends.
 // User Story: As an authenticated user, I can see the aggregate results of my polls.
-// User Story: As an authenticated user, I can delete polls that I decide I don't want anymore.
+//* User Story: As an authenticated user, I can delete polls that I decide I don't want anymore.
 //* User Story: As an authenticated user, I can create a poll with any number of possible items.
 //* User Story: As an unauthenticated or authenticated user, I can see and vote on everyone's polls.
-// User Story: As an unauthenticated or authenticated user, I can see the results of polls in chart form. (This could be implemented using Chart.js or Google Charts.)
+// User Story: As an unauthenticated or authenticated user, I can see the results of polls in chart form.
+//    (This could be implemented using Chart.js or Google Charts.)
 // User Story: As an authenticated user, if I don't like the options on a poll, I can create a new option.
 
 function BP(props){
@@ -178,12 +179,53 @@ const Body = React.createClass({
   render() {
     // console.log('Body');
     // console.log(this.props);
+    var chartData = {
+        type: 'bar',
+        data: {
+            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+            datasets: [{
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+          options: {
+              scales: {
+                  yAxes: [{
+                      ticks: {
+                          beginAtZero:true
+                      }
+                  }]
+              }
+          }
+        };
+
+    // console.log('body chartData');
+    // console.log(chartData);
     var heading = this.props.title;
     var body = this.props.children;
     return (
       <div>
         <div  className="jumbotron">
           <h2>{heading}</h2>
+          <canvas id="myChart" width="400" height="400"></canvas>
+          <MyChart data={chartData}></MyChart>
         </div>
           <div className="row">
             <div className="col-sm-6">
@@ -193,8 +235,20 @@ const Body = React.createClass({
             </div>
           </div>
       </div>
-
     );
+  }
+});
+
+var MyChart = React.createClass({
+  componentDidMount(){
+    var ctx = document.getElementById("myChart");
+    console.log('ctx');
+    console.log(ctx);
+    console.log(this.props.data);
+    var myChart = new Chart(ctx, this.props.data)
+  },
+  render(){
+    return null;
   }
 });
 

@@ -173,14 +173,20 @@ const Body = React.createClass({
     // console.log(this.props);
     var heading = this.props.title;
     var body = this.props.children;
-
     return (
-      <div className="jumbotron">
-        <div>
+      <div>
+        <div  className="jumbotron">
           <h2>{heading}</h2>
-          {body}
         </div>
+          <div className="row">
+            <div className="col-sm-6">
+              {body}
+            </div>
+            <div className="col-sm-6">
+            </div>
+          </div>
       </div>
+
     );
   }
 });
@@ -210,6 +216,7 @@ const Poll = React.createClass({
       {poll: poll, message: ''}
     )
   },
+
   handleSubmit(event){
     event.preventDefault();
     var submitted = this.state.value;
@@ -276,14 +283,14 @@ const Poll = React.createClass({
       } else {
         // console.log('auth true');
         var del = (
-          <div>
+          <span>
             <div>
               <button className='btn btn-warning btn-sm' type='button' name='edit'>Edit</button>
             </div>
             <div>
               <button className='btn btn-danger btn-sm'  type='button' name='delete'>Delete</button>
             </div>
-          </div>
+          </span>
         );
       }
       const myOptions = items.map((item, index) =>
@@ -307,6 +314,7 @@ const Poll = React.createClass({
     return (
       <div>
         {form}
+        <Tweet poll={this.state.poll}/>
       </div>
     )
   }
@@ -564,6 +572,23 @@ const About = React.createClass({
     )
   }
 })
+
+const Tweet = React.createClass({
+  componentDidMount(){
+    console.log(this.props.poll);
+    var id = this.props.poll._id;
+    var name = 'New Poll: ' + this.props.poll.name;
+    var url = window.location.href + '?poll=' + id;
+    var elem = document.getElementById('twit-share');
+    var data = {};
+    data.text = name;
+    data.size = 'large';
+    twttr.widgets.createShareButton(url, elem, data);
+  },
+  render(){
+    return <a id='twit-share'></a>
+  }
+});
 
 ReactDOM.render(
   <Main />,

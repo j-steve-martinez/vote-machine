@@ -224,14 +224,13 @@ const Body = React.createClass({
       <div>
         <div  className="jumbotron">
           <h2>{heading}</h2>
-          <canvas id="myChart" width="400" height="400"></canvas>
-          <MyChart data={chartData}></MyChart>
         </div>
           <div className="row">
             <div className="col-sm-6">
               {body}
             </div>
             <div className="col-sm-6">
+              <canvas id="myChart" width="400" height="400"></canvas>
             </div>
           </div>
       </div>
@@ -339,6 +338,62 @@ const Poll = React.createClass({
     console.log(this.state);
     console.log('Poll props');
     console.log(this.props);
+    var pName, pLabels = [], pTotals = [];
+    pName = this.state.poll.name;
+    this.state.poll.list.forEach(item => {
+      pLabels.push(item.key);
+      pTotals.push(item.value);
+    });
+    var myData = {}
+    myData.type = 'bar';
+    myData.data = {};
+    // myData.data.labels = ['Foo', 'Bar'];
+    myData.data.labels = pLabels;
+    myData.data.datasets = [];
+    var dataSet = {};
+    dataSet.label = "Total";
+    // dataSet.data = [3,4];
+    dataSet.data = pTotals;
+    dataSet.backgroundColor = ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)','rgba(255, 206, 86, 0.2)'];
+    dataSet.borderColor = ['rgba(255,99,132,1)', 'rgba(54, 162, 235, 1)'];
+    dataSet.borderWidth = 1;
+    myData.data.datasets.push(dataSet);
+    var myOptions = { scales: { yAxes: [{ticks: { beginAtZero:true }}] }};
+    myOptions.title = {};
+    // myOptions.title.text = 'Foo or Bar?';
+    myOptions.title.text = pName;
+    myOptions.title.display = true;
+    myData.options = myOptions;
+    console.log('myData');
+    console.log(myData);
+    var chartData = {
+        type: 'bar',
+        data: {
+            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+            datasets: [{
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+
+        };
 
     var name = this.state.poll.name;
     var list = this.state.poll.list;
@@ -385,13 +440,14 @@ const Poll = React.createClass({
           </form>
           {del}
           <h3>{this.state.message}</h3>
+          <MyChart data={myData}></MyChart>
         </Body>)
     }
 
     return (
       <div>
-        {form}
         <Tweet poll={this.state.poll}/>
+        {form}
       </div>
     )
   }

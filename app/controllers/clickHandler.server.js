@@ -31,6 +31,40 @@ function ClickHandler () {
 			});
 	}
 
+	this.addPoll = (req, res) => {
+		// console.log(req.params);
+		req.on('data', function(chunk) {
+			var data = JSON.parse(chunk.toString());
+			// console.log(data);
+			var name = data.name;
+			var uid = +data.uid;
+			Poll.find({name : data.name, uid : data.uid}, (err, poll) => {
+				if (err) {
+					throw err;
+				}
+
+				if (poll.length) {
+					// console.log('sending json');
+					res.json({isExists : true, isSaved : false});
+				} else {
+					var newPoll = new Poll(data);
+					// console.log('newPoll');
+					// console.log(newPoll);
+					// Saving it to the database.
+					newPoll.save(function (err, data) {
+						if (err) {
+							// console.log ('Error on save!');
+							res.json({isExists : false, isSaved : false});
+						}
+						// console.log('data saved');
+						// console.log(data);
+						res.json({isExists : false, isSaved : true, poll : data});
+					});
+				}
+			});
+		});
+	}
+
 	this.getPoll = (req, res) => {
 		console.log('getPoll');
 		console.log(req.params.id);
@@ -77,38 +111,19 @@ function ClickHandler () {
 		});
 	}
 
-	this.addUserPoll = (req, res) => {
-		// console.log(req.params);
-		req.on('data', function(chunk) {
-			var data = JSON.parse(chunk.toString());
-			// console.log(data);
-			var name = data.name;
-			var uid = +data.uid;
-			Poll.find({name : data.name, uid : data.uid}, (err, poll) => {
-				if (err) {
-					throw err;
-				}
+	this.editPoll = (req, res) => {}
 
-				if (poll.length) {
-					// console.log('sending json');
-					res.json({isExists : true, isSaved : false});
-				} else {
-					var newPoll = new Poll(data);
-					// console.log('newPoll');
-					// console.log(newPoll);
-					// Saving it to the database.
-					newPoll.save(function (err, data) {
-						if (err) {
-							// console.log ('Error on save!');
-							res.json({isExists : false, isSaved : false});
-						}
-						// console.log('data saved');
-						// console.log(data);
-						res.json({isExists : false, isSaved : true, poll : data});
-					});
-				}
+	this.delPoll = (req, res) => {
+		console.log('del getPoll');
+		console.log(req.params.id);
+		Poll
+		  .findByIdAndRemove(req.params.id)
+			.exec((err, poll) => {
+				console.log(req.url);
+				console.log('del Poll Data');
+				console.log(poll);
+				res.json(poll)
 			});
-		});
 	}
 
 	this.getClicks = function (req, res) {

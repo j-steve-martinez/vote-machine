@@ -42,16 +42,12 @@ module.exports = function (app, passport) {
 			res.redirect('/');
 		});
 
-	app.route('/poll/:id')
-		.get((req, res) => {
-			console.log(req.params.id);
-			res.sendFile(path + '/public/poll.html');
-		})
-
 	// get the poll data
 	app.route('/api/poll/:id')
 		.get(clickHandler.getPoll)
 		.put(clickHandler.takePoll)
+		.post(clickHandler.editPoll)
+		.delete(clickHandler.delPoll)
 
 	// get all polls
 	app.route('/api/allPolls')
@@ -60,11 +56,11 @@ module.exports = function (app, passport) {
 	// get user info
 	app.route('/api/:id')
 		.get(isLoggedIn, function (req, res) {
-			console.log('/api/:id');
-			console.log('twitter');
-			console.log(req.user.twitter.id);
-			console.log('github');
-			console.log(req.user.github.id);
+			// console.log('/api/:id');
+			// console.log('twitter');
+			// console.log(req.user.twitter.id);
+			// console.log('github');
+			// console.log(req.user.github.id);
 			if (req.user.twitter.id !== undefined) {
 				res.json(req.user.twitter)
 			} else if (req.user.github.id !== undefined) {
@@ -78,7 +74,7 @@ module.exports = function (app, passport) {
 
 	// to add a new user poll
 	app.route('/api/:id/new')
-		.post(clickHandler.addUserPoll);
+		.post(clickHandler.addPoll);
 
 	app.route('/auth/github')
 		.get(passport.authenticate('github'));

@@ -85,10 +85,17 @@ class Main extends React.Component {
       var allPolls = this.state.allPolls;
       allPolls.push(data.poll);
       var obj = {'path': path, 'poll': data, allPolls : allPolls};
-    } else {
+    } else if (type === 'delete') {
+      allPolls = this.state.allPolls.filter(item => {
+        if (item._id !== data) {
+          return item;
+        }
+      });
+      var obj = {'path': path, allPolls : allPolls};
+    }
+     else {
       var obj = {'path': path, 'poll': data};
     }
-
     this.setState(obj)
   }
   componentDidMount(){
@@ -254,11 +261,30 @@ const Poll = React.createClass({
     // console.log('value: ' + event.target.value);
     this.setState({value: event.target.value});
   },
+  handleDelete(event){
+    console.log('poll handleDelete');
+    // console.log(event.target.);
+    var id = this.state.poll._id;
+    var url = '/api/poll/' + id;
+    fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({id : id})
+    }).then(res => {
+      return res.json();
+    }).then(data => {
+      console.log('delet poll poll api res');
+      console.log(data);
+      this.props.cb('/', 'delete', this.props.poll._id);
+    });
+  },
   render(){
-    // console.log('Poll state');
-    // console.log(this.state);
-    // console.log('Poll props');
-    // console.log(this.props);
+    console.log('Poll state');
+    console.log(this.state);
+    console.log('Poll props');
+    console.log(this.props);
 
     var name = this.state.poll.name;
     var list = this.state.poll.list;
@@ -285,10 +311,7 @@ const Poll = React.createClass({
         var del = (
           <span>
             <div>
-              <button className='btn btn-warning btn-sm' type='button' name='edit'>Edit</button>
-            </div>
-            <div>
-              <button className='btn btn-danger btn-sm'  type='button' name='delete'>Delete</button>
+              <button className='btn btn-danger btn-sm' onClick={this.handleDelete} type='button' name='delete'>Delete</button>
             </div>
           </span>
         );

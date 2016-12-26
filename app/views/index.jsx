@@ -177,20 +177,27 @@ class Main extends React.Component {
 
 const Body = React.createClass({
   render() {
-    // console.log('Body');
+    console.log('Body');
     // console.log(this.props);
     var heading = this.props.title;
     var body = this.props.children;
+    var one = (
+            <div>
+              <div  className="jumbotron">
+                <h2>{heading}</h2>
+              </div>
+              <div>{body}</div>
+              <canvas id="myChart" width="400" height="400"></canvas>
+            </div>
+          );
+    console.log('Heading');
+    console.log(heading);
     if (heading.indexOf('Polls') >= 0 && heading.indexOf('Open') >= 0) {
-      var body = (
-        <div>
-          <div  className="jumbotron">
-            <h2>{heading}</h2>
-          </div>
-          <div>{body}</div>
-          <canvas id="myChart" width="400" height="400"></canvas>
-        </div>
-      );
+      console.log('Polls Open');
+      var body = one;
+    } else if (heading.indexOf('Results') >= 0) {
+      console.log('Results');
+      var body = one;
     } else {
       console.log('Poll');
       var body = (
@@ -365,22 +372,17 @@ const Poll = React.createClass({
     if (items[0]!== '') {
       items.unshift('')
     }
-
+    console.log('myData');
+    console.log(myData);
     if (this.state.message === 'results') {
-      var form = <PollResults poll={this.state.poll} cb={this.props.cb}/>
+      var form = <PollResults poll={this.state.poll} cb={this.props.cb} myData={myData}/>
     } else {
       if (auth.id === false) {
         // console.log('auth false');
         var del = null;
       } else {
         // console.log('auth true');
-        var del = (
-          <span>
-            <div>
-              <button className='btn btn-danger btn-sm' onClick={this.handleDelete} type='button' name='delete'>Delete</button>
-            </div>
-          </span>
-        );
+        var del = (<button className='btn btn-danger btn-sm' onClick={this.handleDelete} type='button' name='delete'>Delete</button>);
       }
       const myOptions = items.map((item, index) =>
        <option ref={item} key={index} value={item}>
@@ -388,22 +390,36 @@ const Poll = React.createClass({
        </option>
       );
       var form =
-        (<Body title={name}>
-          <form className="form-group" onSubmit={this.handleSubmit}>
-            <select className="form-control" id="take-poll" value={this.state.value} onChange={this.handleChange}>
+      (
+        <Body title={name}>
+          <form
+            className="form-group"
+            onSubmit={this.handleSubmit}>
+            <select
+              className="form-control"
+              id="take-poll"
+              value={this.state.value}
+              onChange={this.handleChange}>
               {myOptions}
             </select>
-            <button className='btn btn-success btn-sm' type='button' type="submit">Submit</button>
+            <button
+              className='btn btn-success btn-sm'
+              type='button'
+              type="submit">Submit</button>
+            {del}
           </form>
-          {del}
-          <h3>{this.state.message}</h3>
-          <MyChart data={myData}></MyChart>
-        </Body>)
+          <Tweet poll={this.state.poll}/>
+          <h3>
+            {this.state.message}
+          </h3>
+          <MyChart data={myData}>
+          </MyChart>
+        </Body>
+      )
     }
 
     return (
       <div>
-        <Tweet poll={this.state.poll}/>
         {form}
       </div>
     )
@@ -412,17 +428,38 @@ const Poll = React.createClass({
 
 const PollResults = React.createClass({
   render(){
-    // console.log('Poll Results');
-    // console.log(this.props);
+    console.log('Poll Results');
+    console.log(this.props);
+    var myData = this.props.myData;
+
     var items = this.props.poll.list.map((data, key) => {
-      return (<div key={key}>
-        {data.key} : {data.value}
-      </div>)
+      return (
+          <div className="panel-body"  key={key}>
+            <span>
+              {data.key}
+            </span>
+            <span className="badge">
+              {data.value}
+            </span>
+          </div>
+      )
     })
     // console.log('list');
     // console.log(items);
     // var poll = this.props.poll
-    return (<Body title={this.props.poll.name}>{items}</Body>);
+    return (
+      <Body title={this.props.poll.name}>
+        <div className="panel panel-primary">
+          <div className="panel-heading">
+            <h3 className="panel-title">
+              Results
+            </h3>
+          </div>
+        </div>
+        {items}
+        <MyChart data={myData}></MyChart>
+      </Body>
+    );
   }
 });
 

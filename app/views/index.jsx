@@ -100,7 +100,7 @@ class Main extends React.Component {
     this.setState(obj)
   }
   componentDidMount(){
-    // console.log('Main componentDidMount');
+    console.log('Main componentDidMount');
     this.getAllPolls();
   }
   getAllPolls(){

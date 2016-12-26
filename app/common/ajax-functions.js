@@ -25,28 +25,5 @@ var ajaxFunctions = {
 
       xmlhttp.open(method, url, true);
       xmlhttp.send();
-   },
-   getAllPolls: function getAllPolls(){
-       console.log('getAllPolls started');
-       var myHeaders = new Headers();
-
-       var myInit = { method: 'GET',
-                  headers: myHeaders,
-                  // mode: 'cors',
-                  cache: 'default' };
-
-       var url = '/api/allPolls'
-       var myRequest = new Request(url, myInit);
-       fetch(myRequest).then(res => {
-         console.log('allPolls fetch res');
-         console.log(res.json());
-
-         return res.json();
-         // this.setState({user : data});
-       }).then(allPolls => {
-         console.log('allPolls then');
-         console.log(allPolls);
-         // this.setState(myBlob);
-       });
    }
 };

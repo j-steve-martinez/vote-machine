@@ -10,9 +10,6 @@ var User = new Schema({
 		username: String,
       publicRepos: Number
 	},
-  nbrClicks: {
-    clicks: Number
-  },
 	twitter: {
 		id: String,
 		displayName: String,

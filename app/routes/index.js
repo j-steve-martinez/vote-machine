@@ -93,10 +93,4 @@ module.exports = function (app, passport) {
 			successRedirect: '/',
 			failureRedirect: '/'
 		}));
-
-	app.route('/api/:id/clicks')
-		.get(isLoggedIn, clickHandler.getClicks)
-		.post(isLoggedIn, clickHandler.addClick)
-		.delete(isLoggedIn, clickHandler.resetClicks);
-
 };

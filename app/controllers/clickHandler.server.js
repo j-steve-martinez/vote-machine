@@ -67,12 +67,12 @@ function ClickHandler () {
 	}
 
 	this.getPoll = (req, res) => {
-		console.log('getPoll');
-		console.log(req.params.id);
+		// console.log('getPoll');
+		// console.log(req.params.id);
 		Poll
 			.findOne({'_id': req.params.id})
 			.exec((err, poll) => {
-				console.log(req.url);
+				// console.log(req.url);
 				// console.log('Poll Data');
 				// console.log(poll);
 				res.json(poll)
@@ -113,28 +113,19 @@ function ClickHandler () {
 	}
 
 	this.editPoll = (req, res) => {
-		console.log('editPoll');
-		console.log(req.params.id);
+		// console.log('editPoll');
+		// console.log(req.params.id);
 		req.on('data', function(chunk) {
-			console.log("Edit Received body data:");
-			console.log(chunk.toString());
+			// console.log("Edit Received body data:");
+			// console.log(chunk.toString());
 			var data = JSON.parse(chunk.toString());
-			console.log('data list');
-			console.log(data);
+			// console.log('data list');
+			// console.log(data);
 			var id = req.params.id;
 			var name = data.name;
 			var key = data.key;
 			var value = data.value;
 			var item = new ListItem();
-			// item.key = data.key;
-			// item.value = data.value;
-			console.log('item');
-			console.log(item);
-			// console.log(id);
-			// console.log(name);
-			// console.log(key);
-			// console.log(value);
-
 			Poll
 				.update({
 					'_id': id,
@@ -143,8 +134,8 @@ function ClickHandler () {
 					{ $push : { list: { key: key, value : value, item }}}
 				)
 				.exec((err, poll) => {
-					console.log('edited poll');
-					console.log(poll);
+					// console.log('edited poll');
+					// console.log(poll);
 					res.json(poll);
 				});
 		});
@@ -152,49 +143,49 @@ function ClickHandler () {
 	}
 
 	this.delPoll = (req, res) => {
-		console.log('del getPoll');
-		console.log(req.params.id);
+		// console.log('del getPoll');
+		// console.log(req.params.id);
 		Poll
 		  .findByIdAndRemove(req.params.id)
 			.exec((err, poll) => {
-				console.log(req.url);
-				console.log('del Poll Data');
-				console.log(poll);
+				// console.log(req.url);
+				// console.log('del Poll Data');
+				// console.log(poll);
 				res.json(poll)
 			});
 	}
 
-	this.getClicks = function (req, res) {
-		Users
-			.findOne({ 'github.id': req.user.github.id }, { '_id': false })
-			.exec(function (err, result) {
-				if (err) { throw err; }
+	// this.getClicks = function (req, res) {
+	// 	Users
+	// 		.findOne({ 'github.id': req.user.github.id }, { '_id': false })
+	// 		.exec(function (err, result) {
+	// 			if (err) { throw err; }
+	//
+	// 			res.json(result.nbrClicks);
+	// 		});
+	// };
 
-				res.json(result.nbrClicks);
-			});
-	};
+	// this.addClick = function (req, res) {
+	// 	Users
+	// 		.findOneAndUpdate({ 'github.id': req.user.github.id }, { $inc: { 'nbrClicks.clicks': 1 } })
+	// 		.exec(function (err, result) {
+	// 				if (err) { throw err; }
+	//
+	// 				res.json(result.nbrClicks);
+	// 			}
+	// 		);
+	// };
 
-	this.addClick = function (req, res) {
-		Users
-			.findOneAndUpdate({ 'github.id': req.user.github.id }, { $inc: { 'nbrClicks.clicks': 1 } })
-			.exec(function (err, result) {
-					if (err) { throw err; }
-
-					res.json(result.nbrClicks);
-				}
-			);
-	};
-
-	this.resetClicks = function (req, res) {
-		Users
-			.findOneAndUpdate({ 'github.id': req.user.github.id }, { 'nbrClicks.clicks': 0 })
-			.exec(function (err, result) {
-					if (err) { throw err; }
-
-					res.json(result.nbrClicks);
-				}
-			);
-	};
+	// this.resetClicks = function (req, res) {
+	// 	Users
+	// 		.findOneAndUpdate({ 'github.id': req.user.github.id }, { 'nbrClicks.clicks': 0 })
+	// 		.exec(function (err, result) {
+	// 				if (err) { throw err; }
+	//
+	// 				res.json(result.nbrClicks);
+	// 			}
+	// 		);
+	// };
 
 }
 

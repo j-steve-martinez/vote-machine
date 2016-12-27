@@ -2,13 +2,13 @@
 
 //* User Story: As an authenticated user, I can keep my polls and come back later to access them.
 //* User Story: As an authenticated user, I can share my polls with my friends.
-// User Story: As an authenticated user, I can see the aggregate results of my polls.
+//* User Story: As an authenticated user, I can see the aggregate results of my polls.
 //* User Story: As an authenticated user, I can delete polls that I decide I don't want anymore.
 //* User Story: As an authenticated user, I can create a poll with any number of possible items.
 //* User Story: As an unauthenticated or authenticated user, I can see and vote on everyone's polls.
-// User Story: As an unauthenticated or authenticated user, I can see the results of polls in chart form.
+//* User Story: As an unauthenticated or authenticated user, I can see the results of polls in chart form.
 //    (This could be implemented using Chart.js or Google Charts.)
-// User Story: As an authenticated user, if I don't like the options on a poll, I can create a new option.
+//* User Story: As an authenticated user, if I don't like the options on a poll, I can create a new option.
 
 function BP(props){
   const polls = props.polls;
@@ -121,10 +121,10 @@ class Main extends React.Component {
     var route, path = this.state.path;
     // console.log('Path: ');
     // console.log(path);
-    var pollRe = /\/api\/poll\/\d+/;
+    var pollRe = /\/api\/poll\/\d+/;/\/api\/poll\/\d+/;
 
-    var profileRe = /\/profile\/\d+/;
-    var profileNewRe = /\/profile\/\d+\/new/;
+    var profileRe = /\/profile\/\d+/;/\/profile\/\d+/;
+    var profileNewRe = /\/profile\/\d+\/new/;/\/profile\/\d+\/new/;
     // http://localhost:8080/?poll=585c1507467e68331b82eedb
     if (this.state.poll === undefined) {
       if (this.state.pollId !== undefined) {
@@ -297,7 +297,7 @@ const Poll = React.createClass({
     this.setState({value: e.target.value});
   },
   handleDelete(e){
-    console.log('poll handleDelete');
+    // console.log('poll handleDelete');
     // console.log(e.target.);
     var id = this.state.poll._id;
     var url = '/api/poll/' + id;
@@ -310,8 +310,8 @@ const Poll = React.createClass({
     }).then(res => {
       return res.json();
     }).then(data => {
-      console.log('delet poll poll api res');
-      console.log(data);
+      // console.log('delet poll poll api res');
+      // console.log(data);
       this.props.cb('/', 'delete', this.props.poll._id);
     });
   },
@@ -418,7 +418,7 @@ const Poll = React.createClass({
         // console.log('auth true');
         var del = (<button className='btn btn-danger btn-sm' onClick={this.handleDelete} type='button' name='delete'>Delete</button>);
         var edit = (
-          <div class="form-group">
+          <div className="form-group">
             <button className='btn btn-warning btn-sm' onClick={this.handleEdit} type='button' name='edit'>Add Poll Option</button>
             <input type="text" className="form-control" id="edit"></input>
           </div>
@@ -611,7 +611,7 @@ const NavLink = React.createClass({
   clickH(e){
     // e.preventDefault();
     // console.log('NavLink myClick');
-    console.log(e.target.id);
+    // console.log(e.target.id);
     // prevent default for everything except login and logout
     if (e.target.id.indexOf('log') <= 0 && e.target.id.indexOf('auth') <= 0) {
       e.preventDefault();
@@ -670,9 +670,30 @@ const Header = React.createClass({
     }
     return (
       <div>
-        <nav className="navbar navbar-inversed">
+        <nav className="navbar navbar-inverse">
+          <div className="container-fluid">
+            <div className="navbar-header">
+              <button
+                type="button"
+                className="navbar-toggle collapsed"
+                data-toggle="collapse"
+                data-target="#header-links"
+                aria-expanded="false">
+                <span className="sr-only">
+                  Toggle navigation
+                </span>
+                <span className="icon-bar">
+                </span>
+                <span className="icon-bar">
+                </span>
+                <span className="icon-bar">
+                </span>
+              </button>
+              <NavLink cb={this.props.cb} cn='navbar-brand' to="/">Vote Machine</NavLink>
+            </div>
           {myHeader}
           {name}
+          </div>
         </nav>
       </div>
 
@@ -685,17 +706,29 @@ const HeaderLogin = React.createClass({
     // console.log('HeaderLogin');
     // console.log(this.props);
     return(
-      <ul className="nav navbar-nav">
-        <li className="nav-item active">
-          <NavLink cb={this.props.cb} cn='nav-link' to="/">Home</NavLink>
-        </li>
-        <li className="nav-item">
-          <NavLink cb={this.props.cb} cn='nav-link' to="/auth/twitter">Login with Twitter</NavLink>
-        </li>
-        <li className="nav-item">
-          <NavLink cb={this.props.cb} cn='nav-link' to="/about">About</NavLink>
-        </li>
-      </ul>
+      <div
+        className="collapse navbar-collapse"
+        id="header-links">
+        <ul className="nav navbar-nav navbar-right">
+          <li className="nav-item">
+            <NavLink cb={this.props.cb} cn='nav-link' to="/">All Poll</NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink
+              cb={this.props.cb}
+              cn='nav-link'
+              to="/auth/twitter">
+              Login with Twitter
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink
+              cb={this.props.cb}
+              cn='nav-link'
+              to="/about">About</NavLink>
+          </li>
+        </ul>
+      </div>
     )
   }
 })
@@ -709,15 +742,18 @@ const HeaderLogout = React.createClass({
     var profile = '/api/' + uid + '/profile';
     var profileNew = '/profile/' + uid + '/new';
     return(
-      <ul className="nav navbar-nav">
-        <li className="nav-item active">
-          <NavLink cb={this.props.cb} cn='nav-link' to="/">Home</NavLink>
-        </li>
+    <div
+        className="collapse navbar-collapse"
+        id="header-links">
+      <ul className="nav navbar-nav navbar-right">
         <li className="nav-item">
-          <NavLink cb={this.props.cb} cn='nav-link' to={profileNew}>New Poll</NavLink>
+          <NavLink cb={this.props.cb} cn='nav-link' to="/">All Poll</NavLink>
         </li>
         <li className="nav-item">
           <NavLink cb={this.props.cb} cn='nav-link' to={profile}>My Polls</NavLink>
+        </li>
+        <li className="nav-item">
+          <NavLink cb={this.props.cb} cn='nav-link' to={profileNew}>New Poll</NavLink>
         </li>
         <li className="nav-item">
           <NavLink cb={this.props.cb} cn='nav-link' to="/logout">Logout</NavLink>
@@ -726,6 +762,7 @@ const HeaderLogout = React.createClass({
           <NavLink cb={this.props.cb} cn='nav-link' to="/about">About</NavLink>
         </li>
       </ul>
+    </div>
     )
   }
 })

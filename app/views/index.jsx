@@ -535,7 +535,7 @@ const NewPoll = React.createClass({
     console.log(typeof this.state.items);
     console.log(this.state.items);
     if (this.state.items.length <= 0) {
-      var message = "Please supply a name and options";
+      var message = "Please supply a name and options!";
       this.setState({message : message});
     } else {
       this.state.items.forEach((value, key) => {

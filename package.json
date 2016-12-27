@@ -1,5 +1,5 @@
 {
-  "name": "vote",
+  "name": "vote-machine",
   "version": "0.1.0",
   "description": "Vote in a user provided poll",
   "main": "server.js",
@@ -16,7 +16,8 @@
     "Express",
     "Node",
     "javascript",
-    "boilerplate"
+    "React",
+    "Chart"
   ],
   "scripts": {
     "start": "node server.js"

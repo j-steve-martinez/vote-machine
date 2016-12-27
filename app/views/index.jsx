@@ -14,7 +14,7 @@ function BP(props){
   const polls = props.polls;
   const cb = props.cb;
   const links = polls.map((poll) =>
-    <div className="panel-body" key={poll._id.toString() }><NavLink
+    <div className="panel-body bg-warning" key={poll._id.toString() }><NavLink
               to={'/api/poll/' + poll._id}
               cb={cb} >
               {poll.name}
@@ -121,10 +121,10 @@ class Main extends React.Component {
     var route, path = this.state.path;
     // console.log('Path: ');
     // console.log(path);
-    var pollRe = /\/api\/poll\/\d+/;/\/api\/poll\/\d+/;
+    var pollRe = /\/api\/poll\/\d+/;/\/api\/poll\/\d+/;/\/api\/poll\/\d+/;/\/api\/poll\/\d+/;
 
-    var profileRe = /\/profile\/\d+/;/\/profile\/\d+/;
-    var profileNewRe = /\/profile\/\d+\/new/;/\/profile\/\d+\/new/;
+    var profileRe = /\/profile\/\d+/;/\/profile\/\d+/;/\/profile\/\d+/;/\/profile\/\d+/;
+    var profileNewRe = /\/profile\/\d+\/new/;/\/profile\/\d+\/new/;/\/profile\/\d+\/new/;/\/profile\/\d+\/new/;
     // http://localhost:8080/?poll=585c1507467e68331b82eedb
     if (this.state.poll === undefined) {
       if (this.state.pollId !== undefined) {
@@ -183,7 +183,7 @@ const Body = React.createClass({
     var body = this.props.children;
     var one = (
             <div>
-              <div  className="jumbotron">
+              <div  className="jumbotron center">
                 <h2>{heading}</h2>
               </div>
               <div>{body}</div>
@@ -198,18 +198,20 @@ const Body = React.createClass({
     } else if (heading.indexOf('Polls') >= 0 && heading.indexOf('Your')) {
       // console.log('Results');
       var body = one;
+    } else if (heading.indexOf('Vote Machine') >= 0) {
+      var body = one;
     } else {
       // console.log('Poll');
       var body = (
         <div>
-          <div  className="jumbotron">
+          <div className="jumbotron">
             <h2>{heading}</h2>
           </div>
             <div className="row">
-              <div className="col-sm-6">
+              <div className="col-sm-6 poll" >
                 {body}
               </div>
-              <div className="col-sm-6">
+              <div className="col-sm-6 chart">
                 <canvas id="myChart" width="400" height="400"></canvas>
               </div>
             </div>
@@ -419,7 +421,8 @@ const Poll = React.createClass({
         var del = (<button className='btn btn-danger btn-sm' onClick={this.handleDelete} type='button' name='delete'>Delete</button>);
         var edit = (
           <div className="form-group">
-            <button className='btn btn-warning btn-sm' onClick={this.handleEdit} type='button' name='edit'>Add Poll Option</button>
+            <h5>Add a new option to the Poll:</h5>
+            <button className='btn btn-warning btn-sm' onClick={this.handleEdit} type='button' name='edit'>Add Option</button>
             <input type="text" className="form-control" id="edit"></input>
           </div>
         )
@@ -435,7 +438,8 @@ const Poll = React.createClass({
           <form
             className="form-group"
             onSubmit={this.handleSubmit}>
-            {edit}
+
+            <h5>Please make a selection:</h5>
             <select
               className="form-control"
               id="take-poll"
@@ -448,6 +452,7 @@ const Poll = React.createClass({
               type='button'
               type="submit">Submit</button>
             {del}
+            {edit}
           </form>
           <Tweet poll={this.state.poll}/>
           <h3>
@@ -527,48 +532,54 @@ const NewPoll = React.createClass({
     e.preventDefault();
     var message,uid,poll,name, list = [];
     uid = this.props.auth.id;
-    this.state.items.forEach((value, key) => {
-      var obj = {key : value, value : 0};
-      key === 0 ? name = value : list.push(obj);
-    });
-    // console.log(name);
-    // console.log(list);
-    // console.log(uid);
-    poll = {name : name, uid : uid, list : list}
+    console.log(typeof this.state.items);
+    console.log(this.state.items);
+    if (this.state.items.length <= 0) {
+      var message = "Please supply a name and options";
+      this.setState({message : message});
+    } else {
+      this.state.items.forEach((value, key) => {
+        var obj = {key : value, value : 0};
+        key === 0 ? name = value : list.push(obj);
+      });
+      // console.log(name);
+      // console.log(list);
+      // console.log(uid);
+      poll = {name : name, uid : uid, list : list}
 
-    // console.log('Sending Poll:');
-    // console.log(poll);
+      // console.log('Sending Poll:');
+      // console.log(poll);
 
-    // console.log('new poll submit id: ' + uid);
-    var url = '/api/' + uid + '/new'
-    // var url = '/api/:id/new';
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(poll)
-    }).then(res => {
-      return res.json();
-    }).then(data => {
-      // console.log('new poll fetch data');
-      // console.log(data);
-      if (data.isExists) {
-        message = "Poll Name Already Taken!";
-        this.setState({message : message});
-      } else {
-        if (data.isSaved) {
-          var url = '/';
-          this.props.cb(url, 'new', data);
-        } else {
-          message = "Error saving data";
+      // console.log('new poll submit id: ' + uid);
+      var url = '/api/' + uid + '/new'
+      // var url = '/api/:id/new';
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(poll)
+      }).then(res => {
+        return res.json();
+      }).then(data => {
+        // console.log('new poll fetch data');
+        // console.log(data);
+        if (data.isExists) {
+          message = "Poll Name Already Taken!";
           this.setState({message : message});
+        } else {
+          if (data.isSaved) {
+            var url = '/';
+            this.props.cb(url, 'new', data);
+          } else {
+            message = "Error saving data";
+            this.setState({message : message});
+          }
         }
-      }
 
-    });
-
-    // console.log('data posted');
+      });
+      // console.log('data posted');
+    }
   },
   handleClick(e){
     const text = this.refs.atext.value;
@@ -592,7 +603,7 @@ const NewPoll = React.createClass({
       <Body title='New Poll'>
         <div>Enter a comma seperated list of items to poll.  The first item should be the poll title</div>
         <div>The first item should be the poll title. Example:</div>
-        <code>Title, item1, item2, item3</code>
+        <span className="text-danger bg-warning">[ Title, Item1, Item2, Item3 ]</span>
         <h4>{this.state.message}</h4>
           <form >
             <textarea ref='atext'></textarea>
@@ -670,7 +681,7 @@ const Header = React.createClass({
     }
     return (
       <div>
-        <nav className="navbar navbar-inverse">
+        <nav className="navbar navbar-default">
           <div className="container-fluid">
             <div className="navbar-header">
               <button
@@ -711,7 +722,7 @@ const HeaderLogin = React.createClass({
         id="header-links">
         <ul className="nav navbar-nav navbar-right">
           <li className="nav-item">
-            <NavLink cb={this.props.cb} cn='nav-link' to="/">All Poll</NavLink>
+            <NavLink cb={this.props.cb} cn='nav-link' to="/">All Polls</NavLink>
           </li>
           <li className="nav-item">
             <NavLink
@@ -770,10 +781,49 @@ const HeaderLogout = React.createClass({
 const About = React.createClass({
   render(){
     return (
-      <Body title="About App">
-        <div>The Voting Machine</div>
-        <div>By:<a href="https://github.com/j-steve-martinez" target="_blank">J. Steve Martinez</a></div>
-      </Body>
+      <Body title="Vote Machine">
+        <p className='about bg-warning'>
+          This web site is for the <a href="https://www.freecodecamp.com" target="_blank">freeCodeCamp </a>
+        Dynamic Web Applications Project:
+        <a href="https://www.freecodecamp.com/challenges/build-a-voting-app" target="_blank"> Build a Voting App</a>.
+          <br></br>
+          <br></br>
+        It is a full stack web application that uses
+        <a href="https://www.mongodb.com/" target="_blank"> mongoDB </a>
+         for the back end database,
+        <a href="https://nodejs.org" target="_blank"> Node.js </a>
+         for the web server and
+         <a href="https://facebook.github.io/react/" target="_blanks"> React.js </a>
+          to render html in the client browser.
+        <br></br>
+        <br></br>
+        The app also uses
+        <a href="http://getbootstrap.com" target="_blank"> Bootstrap </a>
+          for the style sheets and
+        <a href="http://www.chartjs.org" target="_blank"> Chart.js </a> to render the data in a bar chart.
+      </p>
+      <div id="credits">
+        <div>
+          <span className="credit">Created By: </span>
+            <a href="https://github.com/j-steve-martinez" target="_blank">
+            J. Steve Martinez
+          </a>
+        </div>
+        <div>
+          <div className="credit">Heroku:</div>
+             <a href="#">
+            vote-machine@heroku.com
+          </a>
+        </div>
+        <div>
+          <div className="credit">GitHub:</div>
+             <a href="#">
+            repo@github.com
+          </a>
+        </div>
+      </div>
+
+    </Body>
     )
   }
 })

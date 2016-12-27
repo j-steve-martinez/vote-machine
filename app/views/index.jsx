@@ -100,7 +100,7 @@ class Main extends React.Component {
     this.setState(obj)
   }
   componentDidMount(){
-    console.log('Main componentDidMount');
+    // console.log('Main componentDidMount');
     this.getAllPolls();
   }
   getAllPolls(){
@@ -177,7 +177,7 @@ class Main extends React.Component {
 
 const Body = React.createClass({
   render() {
-    console.log('Body');
+    // console.log('Body');
     // console.log(this.props);
     var heading = this.props.title;
     var body = this.props.children;
@@ -190,16 +190,16 @@ const Body = React.createClass({
               <canvas id="myChart" width="400" height="400"></canvas>
             </div>
           );
-    console.log('Heading');
-    console.log(heading);
+    // console.log('Heading');
+    // console.log(heading);
     if (heading.indexOf('Polls') >= 0 && heading.indexOf('Open') >= 0) {
-      console.log('Polls Open');
+      // console.log('Polls Open');
       var body = one;
-    } else if (heading.indexOf('Results') >= 0) {
-      console.log('Results');
+    } else if (heading.indexOf('Polls') >= 0 && heading.indexOf('Your')) {
+      // console.log('Results');
       var body = one;
     } else {
-      console.log('Poll');
+      // console.log('Poll');
       var body = (
         <div>
           <div  className="jumbotron">
@@ -223,9 +223,9 @@ const Body = React.createClass({
 const MyChart = React.createClass({
   componentDidMount(){
     var ctx = document.getElementById("myChart");
-    console.log('ctx');
-    console.log(ctx);
-    console.log(this.props.data);
+    // console.log('ctx');
+    // console.log(ctx);
+    // console.log(this.props.data);
     var myChart = new Chart(ctx, this.props.data)
   },
   render(){
@@ -259,8 +259,8 @@ const Poll = React.createClass({
     )
   },
 
-  handleSubmit(event){
-    event.preventDefault();
+  handleSubmit(e){
+    e.preventDefault();
     var submitted = this.state.value;
     // console.log('submitted: ' + submitted);
 
@@ -292,13 +292,13 @@ const Poll = React.createClass({
       });
     }
   },
-  handleChange(event){
-    // console.log('value: ' + event.target.value);
-    this.setState({value: event.target.value});
+  handleChange(e){
+    // console.log('value: ' + e.target.value);
+    this.setState({value: e.target.value});
   },
-  handleDelete(event){
+  handleDelete(e){
     console.log('poll handleDelete');
-    // console.log(event.target.);
+    // console.log(e.target.);
     var id = this.state.poll._id;
     var url = '/api/poll/' + id;
     fetch(url, {
@@ -313,6 +313,39 @@ const Poll = React.createClass({
       console.log('delet poll poll api res');
       console.log(data);
       this.props.cb('/', 'delete', this.props.poll._id);
+    });
+  },
+  handleEdit(e){
+    // console.log(e.target.id);
+    var option = document.getElementById('edit').value;
+    document.getElementById('edit').value = '';
+    var listItem = { key : option, value : 0};
+    var newPoll = this.state.poll;
+    newPoll.list.push({ key : option, value : 0})
+    // poll = this.state.poll;
+    // console.log(document.getElementById('edit').value);
+    var id = this.state.poll._id;
+    listItem.name = this.state.poll.name;
+    var url = '/api/poll/' + id;
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(listItem)
+    }).then(res => {
+      return res.json();
+    }).then(data => {
+      // console.log('edit poll returned data');
+      // console.log(data);
+      // console.log('listItem');
+      // console.log(listItem);
+      // console.log('newPoll');
+      // console.log(newPoll);
+      if (data.ok === 1) {
+        this.setState({poll : newPoll})
+      }
+      // this.props.cb('/', 'delete', this.props.poll._id);
     });
   },
   render(){
@@ -372,17 +405,24 @@ const Poll = React.createClass({
     if (items[0]!== '') {
       items.unshift('')
     }
-    console.log('myData');
-    console.log(myData);
+    // console.log('myData');
+    // console.log(myData);
     if (this.state.message === 'results') {
       var form = <PollResults poll={this.state.poll} cb={this.props.cb} myData={myData}/>
     } else {
       if (auth.id === false) {
         // console.log('auth false');
         var del = null;
+        var edit = null;
       } else {
         // console.log('auth true');
         var del = (<button className='btn btn-danger btn-sm' onClick={this.handleDelete} type='button' name='delete'>Delete</button>);
+        var edit = (
+          <div class="form-group">
+            <button className='btn btn-warning btn-sm' onClick={this.handleEdit} type='button' name='edit'>Add Poll Option</button>
+            <input type="text" className="form-control" id="edit"></input>
+          </div>
+        )
       }
       const myOptions = items.map((item, index) =>
        <option ref={item} key={index} value={item}>
@@ -395,6 +435,7 @@ const Poll = React.createClass({
           <form
             className="form-group"
             onSubmit={this.handleSubmit}>
+            {edit}
             <select
               className="form-control"
               id="take-poll"
@@ -428,8 +469,8 @@ const Poll = React.createClass({
 
 const PollResults = React.createClass({
   render(){
-    console.log('Poll Results');
-    console.log(this.props);
+    // console.log('Poll Results');
+    // console.log(this.props);
     var myData = this.props.myData;
 
     var items = this.props.poll.list.map((data, key) => {
@@ -482,8 +523,8 @@ const NewPoll = React.createClass({
       message : ''
     }
   },
-  handleSubmit(event){
-    event.preventDefault();
+  handleSubmit(e){
+    e.preventDefault();
     var message,uid,poll,name, list = [];
     uid = this.props.auth.id;
     this.state.items.forEach((value, key) => {
@@ -529,14 +570,14 @@ const NewPoll = React.createClass({
 
     // console.log('data posted');
   },
-  handleClick(event){
+  handleClick(e){
     const text = this.refs.atext.value;
     // console.log('form text...');
     // console.log(text);
     let items = text.split(',');
     // console.log(items);
     this.setState({items: items, buttonText: 'Update'})
-    event.preventDefault()
+    e.preventDefault()
   },
   render() {
     // console.log('NewPoll');
@@ -702,7 +743,7 @@ const About = React.createClass({
 
 const Tweet = React.createClass({
   componentDidMount(){
-    console.log(this.props.poll);
+    // console.log(this.props.poll);
     var id = this.props.poll._id;
     var name = 'New Poll: ' + this.props.poll.name;
     var url = window.location.href + '?poll=' + id;

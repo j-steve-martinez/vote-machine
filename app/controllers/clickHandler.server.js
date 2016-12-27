@@ -2,6 +2,7 @@
 
 var Users = require('../models/users.js');
 var Poll = require('../models/polls.js');
+var ListItem = require('../models/listItem.js');
 
 function ClickHandler () {
 	this.getAllPolls = function(req, res){
@@ -111,7 +112,44 @@ function ClickHandler () {
 		});
 	}
 
-	this.editPoll = (req, res) => {}
+	this.editPoll = (req, res) => {
+		console.log('editPoll');
+		console.log(req.params.id);
+		req.on('data', function(chunk) {
+			console.log("Edit Received body data:");
+			console.log(chunk.toString());
+			var data = JSON.parse(chunk.toString());
+			console.log('data list');
+			console.log(data);
+			var id = req.params.id;
+			var name = data.name;
+			var key = data.key;
+			var value = data.value;
+			var item = new ListItem();
+			// item.key = data.key;
+			// item.value = data.value;
+			console.log('item');
+			console.log(item);
+			// console.log(id);
+			// console.log(name);
+			// console.log(key);
+			// console.log(value);
+
+			Poll
+				.update({
+					'_id': id,
+					'name' : name
+				},
+					{ $push : { list: { key: key, value : value, item }}}
+				)
+				.exec((err, poll) => {
+					console.log('edited poll');
+					console.log(poll);
+					res.json(poll);
+				});
+		});
+
+	}
 
 	this.delPoll = (req, res) => {
 		console.log('del getPoll');

@@ -299,7 +299,9 @@ const Poll = React.createClass({
     }
   },
   handleChange(e){
-    // console.log('value: ' + e.target.value);
+    console.log('handleChange');
+    console.log('value: ' + e.target.value);
+    console.log(this.state.poll);
     this.setState({value: e.target.value});
   },
   handleDelete(e){
@@ -355,8 +357,8 @@ const Poll = React.createClass({
     });
   },
   render(){
-    // console.log('Poll state');
-    // console.log(this.state);
+    console.log('Poll state');
+    console.log(this.state);
     // console.log('Poll props');
     // console.log(this.props);
     var pName, pLabels = [], pTotals = [];

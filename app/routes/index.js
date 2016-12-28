@@ -8,8 +8,16 @@ module.exports = function (app, passport) {
 
 	function isLoggedIn (req, res, next) {
 		console.log('starting isAuthenticated');
+		console.log('req.session');
 		console.log(req.session);
+		console.log('req.user');
 		console.log(req.user);
+		console.log('req.rawHeaders');
+		console.log(req.rawHeaders);
+		console.log('req.url');
+		console.log(req.url);
+		console.log('req.path');
+		console.log(req.path);
 		if (req.isAuthenticated()) {
 			console.log('isAuthenticated true');
 			var hour = 36000000
@@ -46,8 +54,9 @@ module.exports = function (app, passport) {
 	app.route('/api/poll/:id')
 		.get(clickHandler.getPoll)
 		.put(clickHandler.takePoll)
-		.post(clickHandler.editPoll)
-		.delete(clickHandler.delPoll)
+	// 	.post(isLoggedIn, clickHandler.editPoll)
+	// 	.delete(isLoggedIn, clickHandler.delPoll)
+	// router.post('/api/poll/:id',isLoggedIn, clickHandler.editPoll)
 
 	// get all polls
 	app.route('/api/allPolls')
@@ -56,9 +65,9 @@ module.exports = function (app, passport) {
 	// get user info
 	app.route('/api/:id')
 		.get(isLoggedIn, function (req, res) {
-			// console.log('/api/:id');
-			// console.log('twitter');
-			// console.log(req.user.twitter.id);
+			console.log('/api/:id');
+			console.log('twitter');
+			console.log(req.user.twitter.id);
 			// console.log('github');
 			// console.log(req.user.github.id);
 			if (req.user.twitter.id !== undefined) {
@@ -74,7 +83,7 @@ module.exports = function (app, passport) {
 
 	// to add a new user poll
 	app.route('/api/:id/new')
-		.post(clickHandler.addPoll);
+		.post(isLoggedIn, clickHandler.addPoll);
 
 	app.route('/auth/github')
 		.get(passport.authenticate('github'));
@@ -93,4 +102,12 @@ module.exports = function (app, passport) {
 			successRedirect: '/',
 			failureRedirect: '/'
 		}));
+
+		// get the poll data
+	app.route('/api/:id/:poll')
+		// .get(clickHandler.getPoll)
+		// .put(clickHandler.takePoll)
+		.post(isLoggedIn, clickHandler.editPoll)
+		.delete(isLoggedIn, clickHandler.delPoll)
+	// router.post('/api/poll/:id',isLoggedIn, clickHandler.editPoll)
 };

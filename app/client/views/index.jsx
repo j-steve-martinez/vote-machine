@@ -68,16 +68,12 @@ function getQueryVariable(variable) {
 class Main extends React.Component {
   constructor(props) {
     super(props);
-    // console.log('auth');
-    // console.log(auth);
-    var pollId = getQueryVariable('poll');
-
+    console.log('Main init');
     this.callBack = this.callBack.bind(this);
-    if (auth === undefined) {
-      auth = {id: false};
-    }
+    var pollId = getQueryVariable('poll');
     var allPolls = [];
     var path = '/';
+    var auth = {id : 'false'};
     this.state = {auth, allPolls, path : path, pollId : pollId};
   }
   callBack(path, type, data){
@@ -103,8 +99,20 @@ class Main extends React.Component {
     this.setState(obj)
   }
   componentDidMount(){
-    // console.log('Main componentDidMount');
+    console.log('Main componentDidMount');
     this.getAllPolls();
+  }
+  componentWillMount(){
+    console.log('Main componentWillMount');
+    var apiUrl = appUrl + '/api/:id';
+    $.ajax({
+      url : apiUrl,
+      method: 'GET'
+    }).then(auth => {
+      console.log('getting auth');
+      console.log(auth);
+      this.setState({auth})
+    })
   }
   getAllPolls(){
     var url = '/api/allPolls'
@@ -300,33 +308,45 @@ const Poll = React.createClass({
     }
   },
   handleChange(e){
+    e.preventDefault();
     // console.log('poll handleChange');
     // console.log('value: ' + e.target.value);
     // console.log(this.state.poll);
     this.setState({value: e.target.value});
   },
   handleDelete(e){
+    e.preventDefault();
     // console.log('poll handleDelete');
     // console.log(e.target.);
-    var id = this.state.poll._id;
-    var url = '/api/poll/' + id;
-    fetch(url, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({id : id})
-    }).then(res => {
-      return res.json();
+    var pollId = this.state.poll._id;
+    var apiUrl = appUrl + '/api/:id/' + pollId;
+    $.ajax({
+      url : apiUrl,
+      method: 'DELETE'
     }).then(data => {
-      // console.log('delet poll poll api res');
-      // console.log(data);
-      this.props.cb('/', 'delete', this.props.poll._id);
-    });
+      console.log('edit done');
+      console.log(data);
+      // this.props.cb('/', 'delete', this.props.poll._id);
+
+    })
+    // fetch(url, {
+    //   method: 'DELETE',
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify({id : id})
+    // }).then(res => {
+    //   return res.json();
+    // }).then(data => {
+    //   // console.log('delet poll poll api res');
+    //   // console.log(data);
+    //   this.props.cb('/', 'delete', this.props.poll._id);
+    // });
   },
   handleEdit(e){
-    // console.log('poll handleEdit');
-    // console.log(e.target.id);
+    e.preventDefault();
+    console.log('poll handleEdit');
+    console.log(e.target.id);
     var option = document.getElementById('edit').value;
     document.getElementById('edit').value = '';
     var listItem = { key : option, value : 0};
@@ -334,29 +354,22 @@ const Poll = React.createClass({
     newPoll.list.push({ key : option, value : 0})
     // poll = this.state.poll;
     // console.log(document.getElementById('edit').value);
-    var id = this.state.poll._id;
+    var pollId = this.state.poll._id;
     listItem.name = this.state.poll.name;
-    var url = '/api/poll/' + id;
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(listItem)
-    }).then(res => {
-      return res.json();
+    var uid = this.state.poll.uid;
+    var apiUrl = appUrl + '/api/:id/' + pollId;
+    console.log(apiUrl);
+    $.ajax({
+      url : apiUrl,
+      data: listItem,
+      method: 'POST'
     }).then(data => {
-      // console.log('edit poll returned data');
-      // console.log(data);
-      // console.log('listItem');
-      // console.log(listItem);
-      // console.log('newPoll');
-      // console.log(newPoll);
-      if (data.ok === 1) {
+      console.log('edit done');
+      console.log(data);
+      if (data.nModified === 1) {
         this.setState({poll : newPoll})
       }
-      // this.props.cb('/', 'delete', this.props.poll._id);
-    });
+    })
   },
   render(){
     // console.log('Poll state');

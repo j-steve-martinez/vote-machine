@@ -40,6 +40,7 @@
     "passport": "^0.3.0",
     "passport-github": "^1.0.0",
     "passport-twitter": "1.0.4",
+    "querystring": "0.2.0",
     "react": "15.4.1",
     "react-dom": "15.4.1"
   },

@@ -1,5 +1,5 @@
 'use strict';
-
+var QueryString = require('querystring');
 var Users = require('../models/users.js');
 var Poll = require('../models/polls.js');
 var ListItem = require('../models/listItem.js');
@@ -113,15 +113,25 @@ function ClickHandler () {
 	}
 
 	this.editPoll = (req, res) => {
-		// console.log('editPoll');
-		// console.log(req.params.id);
+		console.log('editPoll');
+		console.log(req.params.poll);
+		var body = '';
 		req.on('data', function(chunk) {
-			// console.log("Edit Received body data:");
-			// console.log(chunk.toString());
-			var data = JSON.parse(chunk.toString());
-			// console.log('data list');
-			// console.log(data);
-			var id = req.params.id;
+			console.log("Edit Received body data:");
+			console.log(chunk.toString());
+			body += chunk;
+			// console.log(JSON.parse(chunk));
+		});
+		req.on('end', () => {
+			console.log('end');
+			console.log('body');
+			console.log(body);
+
+			var data = QueryString.parse(body);
+			console.log('data');
+			console.log(data);
+
+			var id = req.params.poll;
 			var name = data.name;
 			var key = data.key;
 			var value = data.value;
@@ -134,11 +144,13 @@ function ClickHandler () {
 					{ $push : { list: { key: key, value : value, item }}}
 				)
 				.exec((err, poll) => {
-					// console.log('edited poll');
-					// console.log(poll);
+					console.log('edited poll');
+					console.log(poll);
 					res.json(poll);
 				});
 		});
+
+
 
 	}
 
@@ -146,7 +158,7 @@ function ClickHandler () {
 		// console.log('del getPoll');
 		// console.log(req.params.id);
 		Poll
-		  .findByIdAndRemove(req.params.id)
+		  .findByIdAndRemove(req.params.poll)
 			.exec((err, poll) => {
 				// console.log(req.url);
 				// console.log('del Poll Data');

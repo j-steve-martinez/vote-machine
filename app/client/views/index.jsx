@@ -2,7 +2,6 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var Chart = require('chart.js');
-var $ = require("jquery");
 
 //* User Story: As an authenticated user, I can keep my polls and come back later to access them.
 //* User Story: As an authenticated user, I can share my polls with my friends.
@@ -266,11 +265,13 @@ const Poll = React.createClass({
   },
 
   handleSubmit(e){
+    // console.log('poll handleSubmit');
     e.preventDefault();
     var submitted = this.state.value;
     // console.log('submitted: ' + submitted);
+    // console.log(typeof submitted);
 
-    if (submitted === undefined) {
+    if (submitted === undefined || submitted === '') {
       var message = 'Please make a selection'
       this.setState({message: message})
     } else {
@@ -299,9 +300,9 @@ const Poll = React.createClass({
     }
   },
   handleChange(e){
-    console.log('handleChange');
-    console.log('value: ' + e.target.value);
-    console.log(this.state.poll);
+    // console.log('poll handleChange');
+    // console.log('value: ' + e.target.value);
+    // console.log(this.state.poll);
     this.setState({value: e.target.value});
   },
   handleDelete(e){
@@ -324,6 +325,7 @@ const Poll = React.createClass({
     });
   },
   handleEdit(e){
+    // console.log('poll handleEdit');
     // console.log(e.target.id);
     var option = document.getElementById('edit').value;
     document.getElementById('edit').value = '';
@@ -357,8 +359,8 @@ const Poll = React.createClass({
     });
   },
   render(){
-    console.log('Poll state');
-    console.log(this.state);
+    // console.log('Poll state');
+    // console.log(this.state);
     // console.log('Poll props');
     // console.log(this.props);
     var pName, pLabels = [], pTotals = [];

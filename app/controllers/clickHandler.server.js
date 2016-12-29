@@ -16,29 +16,34 @@ function ClickHandler () {
 		});
 	}
 
-	this.getUserPolls = function(req, res){
-		console.log(req.params.id);
+	// get all user polls
+	this.getPolls = function(req, res){
+		// console.log('twitter id');
+		// console.log(typeof req.user.twitter.id);
+		var id = req.user.twitter.id;
 		Poll
 			.find()
 			.exec((err, data) => {
 				if (err) { throw err;	}
 				// console.log('getUserPolls');
 				var polls = data.filter(poll => {
-					if (poll.uid === +req.params.id) {
+					if (poll.uid.toString() === id) {
 						return poll;
 					}
 				});
+				console.log(polls);
 				res.json(polls);
 			});
 	}
 
 	this.addPoll = (req, res) => {
 		// console.log(req.params);
-		req.on('data', function(chunk) {
-			var data = JSON.parse(chunk.toString());
+		req.on('data', function(body) {
+			var data = JSON.parse(body);
 			// console.log(data);
 			var name = data.name;
 			var uid = +data.uid;
+
 			Poll.find({name : data.name, uid : data.uid}, (err, poll) => {
 				if (err) {
 					throw err;
@@ -82,10 +87,10 @@ function ClickHandler () {
 	this.takePoll = (req, res) => {
 		// console.log('editPoll');
 		// console.log(req.params.id);
-		req.on('data', function(chunk) {
+		req.on('data', function(body) {
 			// console.log("Received body data:");
 			// console.log(chunk.toString());
-			var data = JSON.parse(chunk.toString());
+			var data = JSON.parse(body);
 			// console.log('data list');
 			// console.log(data);
 			var id = data.id;
@@ -113,45 +118,35 @@ function ClickHandler () {
 	}
 
 	this.editPoll = (req, res) => {
-		console.log('editPoll');
-		console.log(req.params.poll);
-		var body = '';
-		req.on('data', function(chunk) {
-			console.log("Edit Received body data:");
-			console.log(chunk.toString());
-			body += chunk;
-			// console.log(JSON.parse(chunk));
-		});
-		req.on('end', () => {
-			console.log('end');
-			console.log('body');
-			console.log(body);
-
-			var data = QueryString.parse(body);
-			console.log('data');
-			console.log(data);
-
+		// console.log('editPoll');
+		// console.log(req.params.poll);
+		// console.log(req.data);
+		req.on('data', body => {
+			// console.log('data');
+			// console.log(JSON.parse(body));
+			var data = JSON.parse(body);
 			var id = req.params.poll;
 			var name = data.name;
 			var key = data.key;
 			var value = data.value;
-			var item = new ListItem();
+			// console.log(id);
+			// console.log(name);
+			// console.log(key);
+			// console.log(value);
+			// var item = new ListItem();
 			Poll
 				.update({
 					'_id': id,
 					'name' : name
 				},
-					{ $push : { list: { key: key, value : value, item }}}
+					{ $push : { list: { key: key, value : value}}}
 				)
 				.exec((err, poll) => {
-					console.log('edited poll');
-					console.log(poll);
+					// console.log('edited poll');
+					// console.log(poll);
 					res.json(poll);
 				});
 		});
-
-
-
 	}
 
 	this.delPoll = (req, res) => {
@@ -166,38 +161,6 @@ function ClickHandler () {
 				res.json(poll)
 			});
 	}
-
-	// this.getClicks = function (req, res) {
-	// 	Users
-	// 		.findOne({ 'github.id': req.user.github.id }, { '_id': false })
-	// 		.exec(function (err, result) {
-	// 			if (err) { throw err; }
-	//
-	// 			res.json(result.nbrClicks);
-	// 		});
-	// };
-
-	// this.addClick = function (req, res) {
-	// 	Users
-	// 		.findOneAndUpdate({ 'github.id': req.user.github.id }, { $inc: { 'nbrClicks.clicks': 1 } })
-	// 		.exec(function (err, result) {
-	// 				if (err) { throw err; }
-	//
-	// 				res.json(result.nbrClicks);
-	// 			}
-	// 		);
-	// };
-
-	// this.resetClicks = function (req, res) {
-	// 	Users
-	// 		.findOneAndUpdate({ 'github.id': req.user.github.id }, { 'nbrClicks.clicks': 0 })
-	// 		.exec(function (err, result) {
-	// 				if (err) { throw err; }
-	//
-	// 				res.json(result.nbrClicks);
-	// 			}
-	// 		);
-	// };
 
 }
 

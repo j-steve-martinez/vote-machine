@@ -7,26 +7,26 @@ var index = path + '/public/index.html';
 module.exports = function (app, passport) {
 
 	function isLoggedIn (req, res, next) {
-		console.log('starting isAuthenticated');
-		console.log('req.session');
-		console.log(req.session);
-		console.log('req.user');
-		console.log(req.user);
-		console.log('req.rawHeaders');
-		console.log(req.rawHeaders);
-		console.log('req.url');
-		console.log(req.url);
-		console.log('req.path');
-		console.log(req.path);
+		// console.log('starting isAuthenticated');
+		// console.log('req.session');
+		// console.log(req.session);
+		// console.log('req.user');
+		// console.log(req.user);
+		// console.log('req.rawHeaders');
+		// console.log(req.rawHeaders);
+		// console.log('req.url');
+		// console.log(req.url);
+		// console.log('req.path');
+		// console.log(req.path);
 		if (req.isAuthenticated()) {
-			console.log('isAuthenticated true');
+			// console.log('isAuthenticated true');
 			var hour = 36000000
 			req.session.cookie.expires = new Date(Date.now() + hour)
 			req.session.cookie.maxAge = hour
 			return next();
 		}	else {
-			console.log('isAuthenticated false');
-			console.log(req.url);
+			// console.log('isAuthenticated false');
+			// console.log(req.url);
 			res.json({id: false});
 		}
 	}
@@ -35,7 +35,7 @@ module.exports = function (app, passport) {
 
 	app.route('/')
 		.get(function (req, res) {
-			console.log(req.params);
+			// console.log(req.params);
 			res.sendFile(index);
 		});
 
@@ -50,13 +50,10 @@ module.exports = function (app, passport) {
 			res.redirect('/');
 		});
 
-	// get the poll data
+	// get and take a poll
 	app.route('/api/poll/:id')
 		.get(clickHandler.getPoll)
 		.put(clickHandler.takePoll)
-	// 	.post(isLoggedIn, clickHandler.editPoll)
-	// 	.delete(isLoggedIn, clickHandler.delPoll)
-	// router.post('/api/poll/:id',isLoggedIn, clickHandler.editPoll)
 
 	// get all polls
 	app.route('/api/allPolls')
@@ -65,9 +62,9 @@ module.exports = function (app, passport) {
 	// get user info
 	app.route('/api/:id')
 		.get(isLoggedIn, function (req, res) {
-			console.log('/api/:id');
-			console.log('twitter');
-			console.log(req.user.twitter.id);
+			// console.log('/api/:id');
+			// console.log('twitter');
+			// console.log(req.user.twitter.id);
 			// console.log('github');
 			// console.log(req.user.github.id);
 			if (req.user.twitter.id !== undefined) {
@@ -76,14 +73,6 @@ module.exports = function (app, passport) {
 				res.json(req.user.github);
 			}
 		});
-
-	// get the user polls
-  app.route('/api/:id/profile')
-		.get(clickHandler.getUserPolls);
-
-	// to add a new user poll
-	app.route('/api/:id/new')
-		.post(isLoggedIn, clickHandler.addPoll);
 
 	app.route('/auth/github')
 		.get(passport.authenticate('github'));
@@ -103,11 +92,12 @@ module.exports = function (app, passport) {
 			failureRedirect: '/'
 		}));
 
-		// get the poll data
+	// add, get, edit, delete the user poll data
+	// must be authenticated
 	app.route('/api/:id/:poll')
-		// .get(clickHandler.getPoll)
-		// .put(clickHandler.takePoll)
-		.post(isLoggedIn, clickHandler.editPoll)
+		.get(isLoggedIn, clickHandler.getPolls)
+		.put(isLoggedIn, clickHandler.editPoll)
+		.post(isLoggedIn, clickHandler.addPoll)
 		.delete(isLoggedIn, clickHandler.delPoll)
-	// router.post('/api/poll/:id',isLoggedIn, clickHandler.editPoll)
+
 };

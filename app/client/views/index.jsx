@@ -68,12 +68,14 @@ function getQueryVariable(variable) {
 class Main extends React.Component {
   constructor(props) {
     super(props);
-    console.log('Main init');
+    // console.log('Main init');
     this.callBack = this.callBack.bind(this);
     var pollId = getQueryVariable('poll');
     var allPolls = [];
     var path = '/';
-    var auth = {id : 'false'};
+    // TODO: used for debugging set to false
+    // var auth = {id : 243224486};
+    var auth = {id : false};
     this.state = {auth, allPolls, path : path, pollId : pollId};
   }
   callBack(path, type, data){
@@ -99,22 +101,7 @@ class Main extends React.Component {
     this.setState(obj)
   }
   componentDidMount(){
-    console.log('Main componentDidMount');
-    this.getAllPolls();
-  }
-  componentWillMount(){
-    console.log('Main componentWillMount');
-    var apiUrl = appUrl + '/api/:id';
-    $.ajax({
-      url : apiUrl,
-      method: 'GET'
-    }).then(auth => {
-      console.log('getting auth');
-      console.log(auth);
-      this.setState({auth})
-    })
-  }
-  getAllPolls(){
+    // console.log('Main componentDidMount');
     var url = '/api/allPolls'
     var myRequest = new Request(url);
     fetch(myRequest).then(res => {
@@ -126,17 +113,30 @@ class Main extends React.Component {
       this.setState(polls);
     });
   }
+  componentWillMount(){
+    // console.log('Main componentWillMount');
+    var apiUrl = appUrl + '/api/:id';
+    $.ajax({
+      url : apiUrl,
+      method: 'GET'
+    }).then(auth => {
+      // console.log('getting auth');
+
+      // TODO: used for debugged routes remove
+      // var auth = {id : 243224486};
+      // console.log(auth);
+      this.setState({auth})
+    })
+  }
   render(){
     // console.log('Main this.state');
     // console.log(this.state);
     var route, path = this.state.path;
     // console.log('Path: ');
     // console.log(path);
-    var pollRe = /\/api\/poll\/\d+/;/\/api\/poll\/\d+/;/\/api\/poll\/\d+/;/\/api\/poll\/\d+/;
-
-    var profileRe = /\/profile\/\d+/;/\/profile\/\d+/;/\/profile\/\d+/;/\/profile\/\d+/;
-    var profileNewRe = /\/profile\/\d+\/new/;/\/profile\/\d+\/new/;/\/profile\/\d+\/new/;/\/profile\/\d+\/new/;
-    // http://localhost:8080/?poll=585c1507467e68331b82eedb
+    var pollRe = /\/api\/poll\/\d+/;
+    var profileRe = /\/profile\/\d+/;
+    var profileNewRe = /\/profile\/\d+\/new/;
     if (this.state.poll === undefined) {
       if (this.state.pollId !== undefined) {
         if (this.state.allPolls.length > 0) {
@@ -292,18 +292,20 @@ const Poll = React.createClass({
       }
       // console.log(results);
       var url = '/api/poll/' + results.id;
-      fetch(url, {
+      $.ajax({
+        url : url,
+        data: JSON.stringify(results),
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(results)
-      }).then(res => {
-        return res.json();
+        contentType: "application/json",
+        dataType: 'json'
       }).then(data => {
-        // console.log('poll poll fetch data');
+        // console.log('submitted done');
         // console.log(data);
-        this.setState({poll : data, message : 'results'})
+        // if (data.nModified === 1) {
+          // console.log('new setState');
+          // console.log(data);
+          this.setState({poll : data, message : 'results'})
+        // }
       });
     }
   },
@@ -324,29 +326,15 @@ const Poll = React.createClass({
       url : apiUrl,
       method: 'DELETE'
     }).then(data => {
-      console.log('edit done');
-      console.log(data);
-      // this.props.cb('/', 'delete', this.props.poll._id);
-
+      // console.log('delete done');
+      // console.log(data);
+      this.props.cb('/', 'delete', data._id);
     })
-    // fetch(url, {
-    //   method: 'DELETE',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify({id : id})
-    // }).then(res => {
-    //   return res.json();
-    // }).then(data => {
-    //   // console.log('delet poll poll api res');
-    //   // console.log(data);
-    //   this.props.cb('/', 'delete', this.props.poll._id);
-    // });
   },
   handleEdit(e){
     e.preventDefault();
-    console.log('poll handleEdit');
-    console.log(e.target.id);
+    // console.log('poll handleEdit');
+    // console.log(e.target);
     var option = document.getElementById('edit').value;
     document.getElementById('edit').value = '';
     var listItem = { key : option, value : 0};
@@ -358,15 +346,21 @@ const Poll = React.createClass({
     listItem.name = this.state.poll.name;
     var uid = this.state.poll.uid;
     var apiUrl = appUrl + '/api/:id/' + pollId;
-    console.log(apiUrl);
+    // console.log(apiUrl);
+    // console.log(listItem);
     $.ajax({
       url : apiUrl,
-      data: listItem,
-      method: 'POST'
+      // data: listItem,
+      data: JSON.stringify(listItem),
+      method: 'PUT',
+      contentType: "application/json",
+      dataType: 'json'
     }).then(data => {
-      console.log('edit done');
-      console.log(data);
+      // console.log('edit done');
+      // console.log(data);
       if (data.nModified === 1) {
+        // console.log('edit setState');
+        // console.log(newPoll);
         this.setState({poll : newPoll})
       }
     })
@@ -553,8 +547,8 @@ const NewPoll = React.createClass({
     e.preventDefault();
     var message,uid,poll,name, list = [];
     uid = this.props.auth.id;
-    console.log(typeof this.state.items);
-    console.log(this.state.items);
+    // console.log(typeof this.state.items);
+    // console.log(this.state.items);
     if (this.state.items.length <= 0) {
       var message = "Please supply a name and options!";
       this.setState({message : message});
@@ -572,17 +566,16 @@ const NewPoll = React.createClass({
       // console.log(poll);
 
       // console.log('new poll submit id: ' + uid);
-      var url = '/api/' + uid + '/new'
-      // var url = '/api/:id/new';
-      fetch(url, {
+      // var url = '/api/' + uid + '/new'
+      var url = '/api/:id/new';
+      $.ajax({
+        url : url,
+        data: JSON.stringify(poll),
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(poll)
-      }).then(res => {
-        return res.json();
-      }).then(data => {
+        contentType: "application/json",
+        dataType: 'json'
+      })
+      .then(data => {
         // console.log('new poll fetch data');
         // console.log(data);
         if (data.isExists) {
@@ -597,9 +590,7 @@ const NewPoll = React.createClass({
             this.setState({message : message});
           }
         }
-
       });
-      // console.log('data posted');
     }
   },
   handleClick(e){
@@ -650,27 +641,46 @@ const NavLink = React.createClass({
       // if api call get data or just call the callback
       if (e.target.id.indexOf('api') !== -1) {
         // console.log('NavLink api called');
-        this.getData(e.target.id)
+        this.getPoll(e.target.id)
+
       } else {
         // console.log('NavLink other called');
-        this.props.cb(e.target.id, 'type test', 'data test');
+        this.props.cb(e.target.id, 'header', false);
       }
     }
   },
-  getData(url){
-    var myRequest = new Request(url);
-    fetch(myRequest).then(res => {
-      return res.json();
-    }).then(data => {
-      var type, urlArr = url.split('/');
-      // console.log('url data');
-      // console.log(urlArr);
-      if (urlArr[3] === 'profile') {
-        // console.log('profile');
-        url = '/profile/' + urlArr[2];
-        type = urlArr[3];
-      }
-      this.props.cb(url, type , data);
+  getPoll(data){
+    var id,url,method,type,route;
+    // console.log('url');
+    // console.log(data);
+    var arr = data.split('/');
+    // console.log(arr);
+    if (arr[2] === 'poll') {
+      id = arr[3];
+      url = '/api/poll/' + id;
+      route = url;
+      method = 'GET';
+      type = 'poll';
+    } else {
+      id = arr[2];
+      url = '/api/:id/profile';
+      route = '/profile/' + id;
+      method = 'GET';
+      type = 'profile';
+    }
+    // console.log(id);
+    // console.log(url);
+    // console.log(method);
+    // console.log(type);
+
+    $.ajax({
+      url : url,
+      method: method
+    })
+    .then(res => {
+      // console.log('link got res');
+      // console.log(res);
+      this.props.cb(route, type, res);
     });
 
   },

@@ -19,7 +19,7 @@ var Schema = mongoose.Schema;
 // ]};
 
 var Poll = new Schema({
-    uid: Number,
+    uid: String,
     name: String,
     list: [{key: String, value: Number}]
 });

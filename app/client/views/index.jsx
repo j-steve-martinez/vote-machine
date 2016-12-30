@@ -836,19 +836,19 @@ const About = React.createClass({
       <div id="credits">
         <div>
           <span className="credit">Created By: </span>
-            <a href="https://github.com/j-steve-martinez" target="_blank">
+            <a className='link' href="https://github.com/j-steve-martinez" target="_blank">
             J. Steve Martinez
           </a>
         </div>
         <div>
           <div className="credit">Heroku:</div>
-             <a href="#">
+             <a className='link' href="#">
             vote-machine@heroku.com
           </a>
         </div>
         <div>
           <div className="credit">GitHub:</div>
-             <a href="#">
+             <a className='link' href="#">
             repo@github.com
           </a>
         </div>

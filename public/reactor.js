@@ -1149,7 +1149,7 @@
 	          ),
 	          React.createElement(
 	            'a',
-	            { href: 'https://github.com/j-steve-martinez', target: '_blank' },
+	            { className: 'link', href: 'https://github.com/j-steve-martinez', target: '_blank' },
 	            'J. Steve Martinez'
 	          )
 	        ),
@@ -1163,7 +1163,7 @@
 	          ),
 	          React.createElement(
 	            'a',
-	            { href: '#' },
+	            { className: 'link', href: '#' },
 	            'vote-machine@heroku.com'
 	          )
 	        ),
@@ -1177,7 +1177,7 @@
 	          ),
 	          React.createElement(
 	            'a',
-	            { href: '#' },
+	            { className: 'link', href: '#' },
 	            'repo@github.com'
 	          )
 	        )

@@ -1,9 +1,11 @@
 $bgDefault      : #5eb833;
-$bgHighlight    : rgba(#27ad71, 0.55);
-$colDefault     : #172a12;
-$colHighlight   : #d2eedd;
-$colHover       : blue;
-$test:#5eb833;
+$bgHighlight    : #5eda23;
+$colDefault     : #fcf8e3;
+$colHighlight   : #4e4a36;
+
+body {
+  background-color: #f6f6f0;
+}
 
 .jumbotron {
   background-color: #d9edf7;
@@ -11,7 +13,6 @@ $test:#5eb833;
   padding-top: 5px;
   padding-bottom: 5px;
   text-align: center;
-
 }
 
 .badge {
@@ -24,7 +25,11 @@ $test:#5eb833;
 }
 
 #credits {
-  background-color: #e6ffe6;
+  background-color: #5eb832;
+}
+
+.link {
+  color: #fcf8e3;
 }
 
 .credit {

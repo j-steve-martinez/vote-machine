@@ -1,18 +1,40 @@
 'use strict';
-var QueryString = require('querystring');
+// var QueryString = require('querystring');
 var Users = require('../models/users.js');
 var Poll = require('../models/polls.js');
-var ListItem = require('../models/listItem.js');
+// var ListItem = require('../models/listItem.js');
 
 function ClickHandler () {
 	this.getAllPolls = function(req, res){
-		Poll
-		.find()
-		.exec(function (err, polls) {
-			if (err) { throw err; }
-			// console.log('clickHandler getAllPolls');
-			// console.log(polls);
-			res.json(polls);
+		Poll.find().exec((err, data) => {
+			if (err) throw err;
+     // console.log('clickHandler getAllPolls');
+     // console.log(polls);
+			res.json(data);
+		});
+	}
+
+	this.addDefault = ()=>{
+		Poll.find({}, (err, data) => {
+			if (err) {
+				throw err
+			}
+			if (data.length === 0) {
+				// add default poll
+				console.log('add default');
+				var poll = new Poll({
+					name : "Do You Like This App?",
+					uid : 'default',
+					list : [
+						{key : 'Yes', value : 0},
+						{key : 'No', value : 0}]
+				});
+				poll.save((err, data) => {
+					if (err) throw err;
+					console.log('save');
+					console.log(data);
+				})
+			}
 		});
 	}
 

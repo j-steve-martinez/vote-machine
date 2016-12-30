@@ -4,6 +4,8 @@ var path = process.cwd();
 var ClickHandler = require(path + '/app/controllers/clickHandler.server.js');
 var index = path + '/public/index.html';
 
+
+
 module.exports = function (app, passport) {
 
 	function isLoggedIn (req, res, next) {
@@ -32,6 +34,7 @@ module.exports = function (app, passport) {
 	}
 
 	var clickHandler = new ClickHandler();
+	clickHandler.addDefault();
 
 	app.route('/')
 		.get(function (req, res) {

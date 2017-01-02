@@ -1,6 +1,6 @@
 'use strict';
 
-var appUrl = window.location.origin;
+// var appUrl = window.location.origin;
 // console.log(appUrl);
 var ajaxFunctions = {
    ready: function ready (fn) {

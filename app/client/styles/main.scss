@@ -90,6 +90,18 @@ body {
     color: $colDefault;
     &:hover {
       color: $colHighlight; }}}
+  .navbar-nav > li > .dropdown-menu {
+    background-color: $bgDefault;
+  }
+  .dropdown-menu {
+    > li > a {
+      color: $colDefault;
+      &:hover, &:focus {
+        color: $colHighlight; }}
+    > .active {
+      > a, > a:hover, > a:focus, {
+        color: $colHighlight;
+        background-color: $bgHighlight; }}}
 @media (max-width: 767px) {
   .navbar-default .navbar-nav .open .dropdown-menu {
     > li > a {

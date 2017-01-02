@@ -133,7 +133,24 @@
 	      return decodeURIComponent(pair[1]);
 	    }
 	  }
-	  console.log('Query variable %s not found', variable);
+	  // console.log('Query variable %s not found', variable);
+	}
+
+	function getColors(num) {
+	  // console.log('getting colors');
+	  var data = { c: [], bg: [] };
+	  var myColors = Please.make_color({
+	    format: 'rgb',
+	    colors_returned: num
+	  });
+	  myColors.forEach(function (item) {
+	    var color = 'rgba(' + item.r + ', ' + item.g + ', ' + item.b + ', ' + '1)';
+	    var bg = 'rgba(' + item.r + ', ' + item.g + ', ' + item.b + ', ' + '0.2)';
+	    data.c.push(color);
+	    data.bg.push(bg);
+	  });
+	  // console.log(data);
+	  return data;
 	}
 
 	var Main = function (_React$Component) {
@@ -171,10 +188,6 @@
 	          break;
 	        case 'delete':
 	          // console.log('cb delete');
-	          // allPolls = this.state.allPolls.filter(item => {
-	          //   if (item._id !== data) return item;
-	          // });
-	          // var obj = {'path': path, allPolls : allPolls};
 	          this.getAllPolls(path);
 	          break;
 	        case 'all':
@@ -218,7 +231,7 @@
 	      var _this3 = this;
 
 	      // console.log('Main componentWillMount');
-	      var apiUrl = appUrl + '/api/:id';
+	      var apiUrl = window.location.origin + '/api/:id';
 	      $.ajax({
 	        url: apiUrl,
 	        method: 'GET'
@@ -226,7 +239,7 @@
 	        // console.log('getting auth');
 
 	        // TODO: used for debugged routes remove
-	        // var auth = {id : 243224486, username : 'Super Long User Name'};
+	        // var auth = {id : 243224486, username : 'Joe Blowhard'};
 	        // console.log(auth);
 	        _this3.setState({ auth: auth });
 	      });
@@ -238,6 +251,8 @@
 
 	      // console.log('Main this.state');
 	      // console.log(this.state);
+	      // console.log(Please);
+	      getColors(5);
 	      var route,
 	          path = this.state.path;
 	      // console.log('Path: ');
@@ -381,8 +396,41 @@
 	    var ctx = document.getElementById("myChart");
 	    // console.log('ctx');
 	    // console.log(ctx);
-	    // console.log(this.props.data);
-	    var myChart = new Chart(ctx, this.props.data);
+	    // console.log(this.props);
+	    var pName,
+	        myChart,
+	        pLabels = [],
+	        pTotals = [],
+	        chartData = {},
+	        data = {},
+	        options = {},
+	        colors = getColors(this.props.poll.list.length);
+
+	    pName = this.props.poll.name;
+	    this.props.poll.list.forEach(function (item) {
+	      pLabels.push(item.key);
+	      pTotals.push(item.value);
+	    });
+
+	    data.label = "Total";
+	    data.data = pTotals;
+	    data.backgroundColor = colors.bg;
+	    data.borderColor = colors.c;
+	    data.borderWidth = 1;
+
+	    options = { scales: { yAxes: [{ ticks: { beginAtZero: true } }] } };
+	    options.title = {};
+	    options.title.text = pName;
+	    options.title.display = true;
+
+	    chartData.type = 'bar';
+	    chartData.data = {};
+	    chartData.data.labels = pLabels;
+	    chartData.data.datasets = [];
+	    chartData.data.datasets.push(data);
+	    chartData.options = options;
+	    console.log(chartData);
+	    myChart = new Chart(ctx, chartData);
 	  },
 	  render: function render() {
 	    return null;
@@ -475,7 +523,7 @@
 	    // console.log('poll handleDelete');
 	    // console.log(e.target.);
 	    var pollId = this.state.poll._id;
-	    var apiUrl = appUrl + '/api/:id/' + pollId;
+	    var apiUrl = window.location.origin + '/api/:id/' + pollId;
 	    $.ajax({
 	      url: apiUrl,
 	      method: 'DELETE'
@@ -501,7 +549,7 @@
 	    var pollId = this.state.poll._id;
 	    listItem.name = this.state.poll.name;
 	    var uid = this.state.poll.uid;
-	    var apiUrl = appUrl + '/api/:id/' + pollId;
+	    var apiUrl = window.location.origin + '/api/:id/' + pollId;
 	    // console.log(apiUrl);
 	    // console.log(listItem);
 	    $.ajax({
@@ -526,34 +574,6 @@
 	    // console.log(this.state);
 	    // console.log('Poll props');
 	    // console.log(this.props);
-	    var pName,
-	        pLabels = [],
-	        pTotals = [];
-	    pName = this.state.poll.name;
-	    this.state.poll.list.forEach(function (item) {
-	      pLabels.push(item.key);
-	      pTotals.push(item.value);
-	    });
-	    var myData = {};
-	    myData.type = 'bar';
-	    myData.data = {};
-	    // myData.data.labels = ['Foo', 'Bar'];
-	    myData.data.labels = pLabels;
-	    myData.data.datasets = [];
-	    var dataSet = {};
-	    dataSet.label = "Total";
-	    // dataSet.data = [3,4];
-	    dataSet.data = pTotals;
-	    dataSet.backgroundColor = ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)'];
-	    dataSet.borderColor = ['rgba(255,99,132,1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'];
-	    dataSet.borderWidth = 1;
-	    myData.data.datasets.push(dataSet);
-	    var myOptions = { scales: { yAxes: [{ ticks: { beginAtZero: true } }] } };
-	    myOptions.title = {};
-	    // myOptions.title.text = 'Foo or Bar?';
-	    myOptions.title.text = pName;
-	    myOptions.title.display = true;
-	    myData.options = myOptions;
 
 	    var name = this.state.poll.name;
 	    var list = this.state.poll.list;
@@ -566,10 +586,9 @@
 	    if (items[0] !== '') {
 	      items.unshift('');
 	    }
-	    // console.log('myData');
-	    // console.log(myData);
+
 	    if (this.state.message === 'results') {
-	      var form = React.createElement(PollResults, { poll: this.state.poll, cb: this.props.cb, myData: myData });
+	      var form = React.createElement(PollResults, { poll: this.state.poll, cb: this.props.cb });
 	    } else {
 	      if (auth.id === false) {
 	        // console.log('auth false');
@@ -598,7 +617,7 @@
 	          React.createElement('input', { type: 'text', className: 'form-control', id: 'edit' })
 	        );
 	      }
-	      var _myOptions = items.map(function (item, index) {
+	      var myOptions = items.map(function (item, index) {
 	        return React.createElement(
 	          'option',
 	          { ref: item, key: index, value: item },
@@ -625,7 +644,7 @@
 	              id: 'take-poll',
 	              value: this.state.value,
 	              onChange: this.handleChange },
-	            _myOptions
+	            myOptions
 	          ),
 	          React.createElement(
 	            'button',
@@ -644,7 +663,7 @@
 	          null,
 	          this.state.message
 	        ),
-	        React.createElement(MyChart, { data: myData })
+	        React.createElement(MyChart, { poll: this.state.poll })
 	      );
 	    }
 
@@ -699,7 +718,7 @@
 	        )
 	      ),
 	      items,
-	      React.createElement(MyChart, { data: myData })
+	      React.createElement(MyChart, { poll: this.props.poll })
 	    );
 	  }
 	});
@@ -977,8 +996,7 @@
 	              'Vote Machine'
 	            )
 	          ),
-	          myHeader,
-	          name
+	          myHeader
 	        )
 	      )
 	    );
@@ -1004,19 +1022,50 @@
 	          React.createElement(
 	            NavLink,
 	            { cb: this.props.cb, cn: 'nav-link', to: '/api/allPolls' },
-	            'All Polls'
+	            'Polls'
 	          )
 	        ),
 	        React.createElement(
 	          'li',
-	          { className: 'nav-item' },
+	          { className: 'dropdown' },
 	          React.createElement(
-	            NavLink,
-	            {
-	              cb: this.props.cb,
-	              cn: 'nav-link',
-	              to: '/auth/twitter' },
-	            'Login with Twitter'
+	            'a',
+	            { href: '#',
+	              className: 'dropdown-toggle',
+	              'data-toggle': 'dropdown',
+	              role: 'button',
+	              'aria-haspopup': 'true',
+	              'aria-expanded': 'false' },
+	            'Login',
+	            React.createElement('span', { className: 'caret' })
+	          ),
+	          React.createElement(
+	            'ul',
+	            { className: 'dropdown-menu' },
+	            React.createElement(
+	              'li',
+	              { className: 'nav-item' },
+	              React.createElement(
+	                NavLink,
+	                {
+	                  cb: this.props.cb,
+	                  cn: 'nav-link',
+	                  to: '/auth/twitter' },
+	                'Twitter'
+	              )
+	            ),
+	            React.createElement(
+	              'li',
+	              { className: 'nav-item' },
+	              React.createElement(
+	                NavLink,
+	                {
+	                  cb: this.props.cb,
+	                  cn: 'nav-link',
+	                  to: '/auth/github' },
+	                'GitHub'
+	              )
+	            )
 	          )
 	        ),
 	        React.createElement(
@@ -1041,15 +1090,15 @@
 	  render: function render() {
 	    // console.log('HeaderLogout');
 	    // console.log(this.props);
+	    var username = this.props.auth.username;
+	    // glyphicon glyphicon-user
 	    var uid = this.props.auth.id;
 	    // var profile = '/api/profile/' + uid;
 	    var profile = '/api/' + uid + '/profile';
 	    var profileNew = '/profile/' + uid + '/new';
 	    return React.createElement(
 	      'div',
-	      {
-	        className: 'collapse navbar-collapse',
-	        id: 'header-links' },
+	      { className: 'collapse navbar-collapse', id: 'header-links' },
 	      React.createElement(
 	        'ul',
 	        { className: 'nav navbar-nav navbar-right' },
@@ -1059,34 +1108,54 @@
 	          React.createElement(
 	            NavLink,
 	            { cb: this.props.cb, cn: 'nav-link', to: '/api/allPolls' },
-	            'All Poll'
+	            'Polls'
 	          )
 	        ),
 	        React.createElement(
 	          'li',
-	          { className: 'nav-item' },
+	          { className: 'dropdown' },
 	          React.createElement(
-	            NavLink,
-	            { cb: this.props.cb, cn: 'nav-link', to: profile },
-	            'My Polls'
-	          )
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'nav-item' },
+	            'a',
+	            { href: '#',
+	              className: 'dropdown-toggle',
+	              'data-toggle': 'dropdown',
+	              role: 'button',
+	              'aria-haspopup': 'true',
+	              'aria-expanded': 'false' },
+	            username,
+	            React.createElement('span', { className: 'caret' })
+	          ),
 	          React.createElement(
-	            NavLink,
-	            { cb: this.props.cb, cn: 'nav-link', to: profileNew },
-	            'New Poll'
-	          )
-	        ),
-	        React.createElement(
-	          'li',
-	          { className: 'nav-item' },
-	          React.createElement(
-	            NavLink,
-	            { cb: this.props.cb, cn: 'nav-link', to: '/logout' },
-	            'Logout'
+	            'ul',
+	            { className: 'dropdown-menu' },
+	            React.createElement(
+	              'li',
+	              { className: 'nav-item' },
+	              React.createElement(
+	                NavLink,
+	                { cb: this.props.cb, cn: 'nav-link', to: profile },
+	                'My Polls'
+	              )
+	            ),
+	            React.createElement(
+	              'li',
+	              { className: 'nav-item' },
+	              React.createElement(
+	                NavLink,
+	                { cb: this.props.cb, cn: 'nav-link', to: profileNew },
+	                'New Poll'
+	              )
+	            ),
+	            React.createElement('li', { role: 'separator', className: 'divider' }),
+	            React.createElement(
+	              'li',
+	              { className: 'nav-item' },
+	              React.createElement(
+	                NavLink,
+	                { cb: this.props.cb, cn: 'nav-link', to: '/logout' },
+	                'Logout'
+	              )
+	            )
 	          )
 	        ),
 	        React.createElement(

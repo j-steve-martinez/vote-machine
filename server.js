@@ -1,5 +1,6 @@
 'use strict';
-
+// mongo ds149998.mlab.com:49998/vote-machine -u <dbuser> -p <dbpassword>
+// mongodb://<dbuser>:<dbpassword>@ds149998.mlab.com:49998/vote-machine
 var express = require('express');
 var routes = require('./app/routes/index.js');
 var mongoose = require('mongoose');

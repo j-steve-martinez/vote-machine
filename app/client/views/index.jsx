@@ -62,7 +62,24 @@ function getQueryVariable(variable) {
             return decodeURIComponent(pair[1]);
         }
     }
-    console.log('Query variable %s not found', variable);
+    // console.log('Query variable %s not found', variable);
+}
+
+function getColors(num){
+  // console.log('getting colors');
+  var data = {c : [], bg : []};
+  var myColors = Please.make_color({
+    format: 'rgb',
+    colors_returned: num
+  });
+  myColors.forEach(item => {
+    var color = 'rgba(' + item.r + ', ' + item.g + ', ' + item.b + ', ' + '1)';
+    var bg = 'rgba(' + item.r + ', ' + item.g + ', ' + item.b + ', ' + '0.2)';
+    data.c.push(color);
+    data.bg.push(bg);
+  });
+  // console.log(data);
+  return data;
 }
 
 class Main extends React.Component {
@@ -91,10 +108,6 @@ class Main extends React.Component {
         break;
       case 'delete':
         // console.log('cb delete');
-        // allPolls = this.state.allPolls.filter(item => {
-        //   if (item._id !== data) return item;
-        // });
-        // var obj = {'path': path, allPolls : allPolls};
         this.getAllPolls(path);
         break;
       case 'all':
@@ -128,7 +141,7 @@ class Main extends React.Component {
   }
   componentWillMount(){
     // console.log('Main componentWillMount');
-    var apiUrl = appUrl + '/api/:id';
+    var apiUrl = window.location.origin + '/api/:id';
     $.ajax({
       url : apiUrl,
       method: 'GET'
@@ -136,7 +149,7 @@ class Main extends React.Component {
       // console.log('getting auth');
 
       // TODO: used for debugged routes remove
-      // var auth = {id : 243224486, username : 'Super Long User Name'};
+      // var auth = {id : 243224486, username : 'Joe Blowhard'};
       // console.log(auth);
       this.setState({auth})
     })
@@ -144,6 +157,8 @@ class Main extends React.Component {
   render(){
     // console.log('Main this.state');
     // console.log(this.state);
+    // console.log(Please);
+    getColors(5);
     var route, path = this.state.path;
     // console.log('Path: ');
     // console.log(path);
@@ -251,8 +266,40 @@ const MyChart = React.createClass({
     var ctx = document.getElementById("myChart");
     // console.log('ctx');
     // console.log(ctx);
-    // console.log(this.props.data);
-    var myChart = new Chart(ctx, this.props.data)
+    // console.log(this.props);
+    var pName, myChart,
+    pLabels = [],
+    pTotals = [],
+    chartData = {},
+    data = {},
+    options = {},
+    colors = getColors(this.props.poll.list.length);
+
+    pName = this.props.poll.name;
+    this.props.poll.list.forEach(item => {
+      pLabels.push(item.key);
+      pTotals.push(item.value);
+    });
+
+    data.label = "Total";
+    data.data = pTotals;
+    data.backgroundColor = colors.bg;
+    data.borderColor = colors.c;
+    data.borderWidth = 1;
+
+    options = { scales: { yAxes: [{ticks: { beginAtZero:true }}] }};
+    options.title = {};
+    options.title.text = pName;
+    options.title.display = true;
+
+    chartData.type = 'bar';
+    chartData.data = {};
+    chartData.data.labels = pLabels;
+    chartData.data.datasets = [];
+    chartData.data.datasets.push(data);
+    chartData.options = options;
+    console.log(chartData);
+    myChart = new Chart(ctx, chartData)
   },
   render(){
     return null;
@@ -334,7 +381,7 @@ const Poll = React.createClass({
     // console.log('poll handleDelete');
     // console.log(e.target.);
     var pollId = this.state.poll._id;
-    var apiUrl = appUrl + '/api/:id/' + pollId;
+    var apiUrl = window.location.origin + '/api/:id/' + pollId;
     $.ajax({
       url : apiUrl,
       method: 'DELETE'
@@ -358,7 +405,7 @@ const Poll = React.createClass({
     var pollId = this.state.poll._id;
     listItem.name = this.state.poll.name;
     var uid = this.state.poll.uid;
-    var apiUrl = appUrl + '/api/:id/' + pollId;
+    var apiUrl = window.location.origin + '/api/:id/' + pollId;
     // console.log(apiUrl);
     // console.log(listItem);
     $.ajax({
@@ -383,46 +430,6 @@ const Poll = React.createClass({
     // console.log(this.state);
     // console.log('Poll props');
     // console.log(this.props);
-    var pName, pLabels = [], pTotals = [];
-    pName = this.state.poll.name;
-    this.state.poll.list.forEach(item => {
-      pLabels.push(item.key);
-      pTotals.push(item.value);
-    });
-    var myData = {}
-    myData.type = 'bar';
-    myData.data = {};
-    // myData.data.labels = ['Foo', 'Bar'];
-    myData.data.labels = pLabels;
-    myData.data.datasets = [];
-    var dataSet = {};
-    dataSet.label = "Total";
-    // dataSet.data = [3,4];
-    dataSet.data = pTotals;
-    dataSet.backgroundColor = [
-        'rgba(255, 99, 132, 0.2)',
-        'rgba(54, 162, 235, 0.2)',
-        'rgba(255, 206, 86, 0.2)',
-        'rgba(75, 192, 192, 0.2)',
-        'rgba(153, 102, 255, 0.2)',
-        'rgba(255, 159, 64, 0.2)'
-    ];
-    dataSet.borderColor = [
-        'rgba(255,99,132,1)',
-        'rgba(54, 162, 235, 1)',
-        'rgba(255, 206, 86, 1)',
-        'rgba(75, 192, 192, 1)',
-        'rgba(153, 102, 255, 1)',
-        'rgba(255, 159, 64, 1)'
-    ];
-    dataSet.borderWidth = 1;
-    myData.data.datasets.push(dataSet);
-    var myOptions = { scales: { yAxes: [{ticks: { beginAtZero:true }}] }};
-    myOptions.title = {};
-    // myOptions.title.text = 'Foo or Bar?';
-    myOptions.title.text = pName;
-    myOptions.title.display = true;
-    myData.options = myOptions;
 
     var name = this.state.poll.name;
     var list = this.state.poll.list;
@@ -435,10 +442,9 @@ const Poll = React.createClass({
     if (items[0]!== '') {
       items.unshift('')
     }
-    // console.log('myData');
-    // console.log(myData);
+
     if (this.state.message === 'results') {
-      var form = <PollResults poll={this.state.poll} cb={this.props.cb} myData={myData}/>
+      var form = <PollResults poll={this.state.poll} cb={this.props.cb}/>
     } else {
       if (auth.id === false) {
         // console.log('auth false');
@@ -486,8 +492,7 @@ const Poll = React.createClass({
           <h3>
             {this.state.message}
           </h3>
-          <MyChart data={myData}>
-          </MyChart>
+          <MyChart poll={this.state.poll}></MyChart>
         </Body>
       )
     }
@@ -531,7 +536,7 @@ const PollResults = React.createClass({
           </div>
         </div>
         {items}
-        <MyChart data={myData}></MyChart>
+        <MyChart poll={this.props.poll}></MyChart>
       </Body>
     );
   }
@@ -757,7 +762,6 @@ const Header = React.createClass({
               <NavLink cb={this.props.cb} cn='navbar-brand' to="/">Vote Machine</NavLink>
             </div>
           {myHeader}
-          {name}
           </div>
         </nav>
       </div>
@@ -776,15 +780,33 @@ const HeaderLogin = React.createClass({
         id="header-links">
         <ul className="nav navbar-nav navbar-right">
           <li className="nav-item">
-            <NavLink cb={this.props.cb} cn='nav-link' to='/api/allPolls'>All Polls</NavLink>
+            <NavLink cb={this.props.cb} cn='nav-link' to='/api/allPolls'>Polls</NavLink>
           </li>
-          <li className="nav-item">
-            <NavLink
-              cb={this.props.cb}
-              cn='nav-link'
-              to="/auth/twitter">
-              Login with Twitter
-            </NavLink>
+          <li className="dropdown">
+            <a href="#"
+               className="dropdown-toggle"
+               data-toggle="dropdown"
+               role="button"
+               aria-haspopup="true"
+               aria-expanded="false">Login<span className="caret"></span></a>
+            <ul className="dropdown-menu">
+              <li className="nav-item">
+                <NavLink
+                  cb={this.props.cb}
+                  cn='nav-link'
+                  to="/auth/twitter">
+                  Twitter
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  cb={this.props.cb}
+                  cn='nav-link'
+                  to="/auth/github">
+                  GitHub
+                </NavLink>
+              </li>
+            </ul>
           </li>
           <li className="nav-item">
             <NavLink
@@ -802,26 +824,38 @@ const HeaderLogout = React.createClass({
   render(){
     // console.log('HeaderLogout');
     // console.log(this.props);
+    var username = this.props.auth.username;
+    // glyphicon glyphicon-user
     var uid = this.props.auth.id;
     // var profile = '/api/profile/' + uid;
     var profile = '/api/' + uid + '/profile';
     var profileNew = '/profile/' + uid + '/new';
     return(
-    <div
-        className="collapse navbar-collapse"
-        id="header-links">
+    <div className="collapse navbar-collapse" id="header-links">
       <ul className="nav navbar-nav navbar-right">
         <li className="nav-item">
-          <NavLink cb={this.props.cb} cn='nav-link' to='/api/allPolls'>All Poll</NavLink>
+          <NavLink cb={this.props.cb} cn='nav-link' to='/api/allPolls'>Polls</NavLink>
         </li>
-        <li className="nav-item">
-          <NavLink cb={this.props.cb} cn='nav-link' to={profile}>My Polls</NavLink>
-        </li>
-        <li className="nav-item">
-          <NavLink cb={this.props.cb} cn='nav-link' to={profileNew}>New Poll</NavLink>
-        </li>
-        <li className="nav-item">
-          <NavLink cb={this.props.cb} cn='nav-link' to="/logout">Logout</NavLink>
+        <li className="dropdown">
+
+          <a href="#"
+             className="dropdown-toggle"
+             data-toggle="dropdown"
+             role="button"
+             aria-haspopup="true"
+             aria-expanded="false">{username}<span className="caret"></span></a>
+          <ul className="dropdown-menu">
+            <li className="nav-item">
+              <NavLink cb={this.props.cb} cn='nav-link' to={profile}>My Polls</NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink cb={this.props.cb} cn='nav-link' to={profileNew}>New Poll</NavLink>
+            </li>
+            <li role="separator" className="divider"></li>
+            <li className="nav-item">
+              <NavLink cb={this.props.cb} cn='nav-link' to="/logout">Logout</NavLink>
+            </li>
+          </ul>
         </li>
         <li className="nav-item">
           <NavLink cb={this.props.cb} cn='nav-link' to="/about">About</NavLink>

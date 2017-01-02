@@ -7,15 +7,15 @@ var configAuth = require('./auth');
 
 module.exports = function (passport) {
 	passport.serializeUser(function (user, done) {
-		console.log('seralizeUser');
-		console.log(user.id);
+		// console.log('seralizeUser');
+		// console.log(user.id);
 		done(null, user.id);
 	});
 
 	passport.deserializeUser(function (id, done) {
 		User.findById(id, function (err, user) {
-			console.log('deserializeUser');
-			console.log(user);
+			// console.log('deserializeUser');
+			// console.log(user);
 			done(err, user);
 		});
 	});
@@ -27,8 +27,8 @@ module.exports = function (passport) {
 	  },
 	  function(token, tokenSecret, profile, done) {
 	    User.findOne({ 'twitter.id': profile.id }, function (err, user) {
-				console.log('user');
-				console.log(user);
+				// console.log('user');
+				// console.log(user);
 				if (err) {
 					return done(err);
 				}
@@ -39,18 +39,10 @@ module.exports = function (passport) {
 					return done(null, user);
 				} else {
 					var newUser = new User();
-					// console.log('twitter profile');
-					// console.log('id');
-					// console.log(profile.id);
-					// console.log('name');
-					// console.log(profile.username);
-					// console.log('display name');
-					// console.log(profile.displayName);
+
 					newUser.twitter.id = profile.id;
 					newUser.twitter.username = profile.username;
 					newUser.twitter.displayName = profile.displayName;
-					// newUser.github.publicRepos = profile._json.public_repos;
-					newUser.nbrClicks.clicks = 0;
 
 					newUser.save(function (err) {
 						if (err) {
@@ -87,7 +79,6 @@ module.exports = function (passport) {
 					newUser.github.username = profile.username;
 					newUser.github.displayName = profile.displayName;
 					newUser.github.publicRepos = profile._json.public_repos;
-					newUser.nbrClicks.clicks = 0;
 
 					newUser.save(function (err) {
 						if (err) {

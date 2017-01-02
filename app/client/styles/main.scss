@@ -1,8 +1,10 @@
-$bgDefault      : #5eb833;
-$bgHighlight    : #5eda23;
+// $bgDefault      : #5eb833;
+$bgDefault      : #337AB7;
+// $bgHighlight    : #5eda23;
+$bgHighlight    : #62aded;
 $colDefault     : #fcf8e3;
 $colHighlight   : #4e4a36;
-
+// #D9EDF7
 body {
   background-color: #f6f6f0;
 }
@@ -25,11 +27,11 @@ body {
 }
 
 #credits {
-  background-color: #5eb832;
+  background-color: #D9EDF7;
 }
 
 .link {
-  color: #fcf8e3;
+  color: #337AB7;
 }
 
 .credit {
@@ -41,6 +43,15 @@ body {
 
 .panel {
   text-align: center;
+}
+
+.user {
+  background-color: #3a6386;
+  padding: 3px;
+  border-radius: 6px;
+}
+.container-fluid {
+  margin-bottom: 5px;
 }
 
 .navbar-default {

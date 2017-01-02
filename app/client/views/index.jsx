@@ -80,38 +80,51 @@ class Main extends React.Component {
   }
   callBack(path, type, data){
     // console.log('Main callBack called');
-    // console.log(path);
-    // console.log(type);
+    // console.log('path ' + path);
+    // console.log('type ' + type);
     // console.log(data);
-    if (type === 'new') {
-      var allPolls = this.state.allPolls;
-      allPolls.push(data.poll);
-      var obj = {'path': path, 'poll': data, allPolls : allPolls};
-    } else if (type === 'delete') {
-      allPolls = this.state.allPolls.filter(item => {
-        if (item._id !== data) {
-          return item;
-        }
-      });
-      var obj = {'path': path, allPolls : allPolls};
-    }
-     else {
-      var obj = {'path': path, 'poll': data};
+    switch (type) {
+      case 'new':
+        var allPolls = this.state.allPolls;
+        allPolls.push(data.poll);
+        var obj = {'path': path, 'poll': data, allPolls : allPolls};
+        break;
+      case 'delete':
+        // console.log('cb delete');
+        // allPolls = this.state.allPolls.filter(item => {
+        //   if (item._id !== data) return item;
+        // });
+        // var obj = {'path': path, allPolls : allPolls};
+        this.getAllPolls(path);
+        break;
+      case 'all':
+        // console.log('cb all');
+        var obj = {'path': path, allPolls : data};
+        break;
+      default:
+        var obj = {'path': path, 'poll': data};
     }
     this.setState(obj)
   }
-  componentDidMount(){
-    // console.log('Main componentDidMount');
+  getAllPolls(path){
+    var path = path;
     var url = '/api/allPolls'
     var myRequest = new Request(url);
     fetch(myRequest).then(res => {
       return res.json();
     }).then(allPolls => {
+      // console.log(allPolls);
       var polls = {};
       polls.allPolls = allPolls;
+      polls.path = path;
+      // console.log(path);
       // console.log(polls);
       this.setState(polls);
     });
+  }
+  componentDidMount(){
+    // console.log('Main componentDidMount');
+    this.getAllPolls('/');
   }
   componentWillMount(){
     // console.log('Main componentWillMount');
@@ -123,7 +136,7 @@ class Main extends React.Component {
       // console.log('getting auth');
 
       // TODO: used for debugged routes remove
-      // var auth = {id : 243224486};
+      // var auth = {id : 243224486, username : 'Super Long User Name'};
       // console.log(auth);
       this.setState({auth})
     })
@@ -326,8 +339,8 @@ const Poll = React.createClass({
       url : apiUrl,
       method: 'DELETE'
     }).then(data => {
-      // console.log('delete done');
-      // console.log(data);
+      console.log('delete done');
+      console.log(data);
       this.props.cb('/', 'delete', data._id);
     })
   },
@@ -641,7 +654,7 @@ const NavLink = React.createClass({
       // if api call get data or just call the callback
       if (e.target.id.indexOf('api') !== -1) {
         // console.log('NavLink api called');
-        this.getPoll(e.target.id)
+        this.getData(e.target.id)
 
       } else {
         // console.log('NavLink other called');
@@ -649,18 +662,26 @@ const NavLink = React.createClass({
       }
     }
   },
-  getPoll(data){
+  getData(data){
     var id,url,method,type,route;
     // console.log('url');
     // console.log(data);
     var arr = data.split('/');
     // console.log(arr);
     if (arr[2] === 'poll') {
+      // console.log('poll');
       id = arr[3];
       url = '/api/poll/' + id;
       route = url;
       method = 'GET';
       type = 'poll';
+    } else if (arr[2] === 'allPolls') {
+      // console.log('allPolls');
+      id = 'none'
+      url = '/api/allPolls';
+      method = 'GET';
+      type = 'all'
+      route = '/'
     } else {
       id = arr[2];
       url = '/api/:id/profile';
@@ -668,8 +689,10 @@ const NavLink = React.createClass({
       method = 'GET';
       type = 'profile';
     }
+    // console.log('navlink all data');
     // console.log(id);
     // console.log(url);
+    // console.log(route);
     // console.log(method);
     // console.log(type);
 
@@ -678,7 +701,7 @@ const NavLink = React.createClass({
       method: method
     })
     .then(res => {
-      // console.log('link got res');
+      // console.log('navlink ajax returned:');
       // console.log(res);
       this.props.cb(route, type, res);
     });
@@ -700,7 +723,7 @@ const Header = React.createClass({
     // console.log('auth');
     // console.log(auth);
     var myHeader, name;
-    auth.id ? name = <span className="navbar-text">Signed in as {auth.username}</span> : null
+    auth.id ? name = <span className="navbar-text user">Signed in as {auth.username}</span> : null
     if (auth.id !== undefined && auth.id !== false ) {
       // console.log('is logged in');
       // console.log(typeof auth);
@@ -753,7 +776,7 @@ const HeaderLogin = React.createClass({
         id="header-links">
         <ul className="nav navbar-nav navbar-right">
           <li className="nav-item">
-            <NavLink cb={this.props.cb} cn='nav-link' to="/">All Polls</NavLink>
+            <NavLink cb={this.props.cb} cn='nav-link' to='/api/allPolls'>All Polls</NavLink>
           </li>
           <li className="nav-item">
             <NavLink
@@ -789,7 +812,7 @@ const HeaderLogout = React.createClass({
         id="header-links">
       <ul className="nav navbar-nav navbar-right">
         <li className="nav-item">
-          <NavLink cb={this.props.cb} cn='nav-link' to="/">All Poll</NavLink>
+          <NavLink cb={this.props.cb} cn='nav-link' to='/api/allPolls'>All Poll</NavLink>
         </li>
         <li className="nav-item">
           <NavLink cb={this.props.cb} cn='nav-link' to={profile}>My Polls</NavLink>

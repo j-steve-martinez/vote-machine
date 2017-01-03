@@ -21,7 +21,7 @@
   ],
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
-    "start:dev": "nodemon server.js",
+    "start:dev": "node server.js",
     "start:prod": "node server.js",
     "dev:client": "webpack --config webpack.config.js -w",
     "build:client": "webpack --config webpack.config.js",

@@ -1258,8 +1258,8 @@
 	          ),
 	          React.createElement(
 	            'a',
-	            { className: 'link', href: '#' },
-	            'vote-machine@heroku.com'
+	            { className: 'link', href: 'https://vote-machine-jsm.herokuapp.com/' },
+	            'https://vote-machine-jsm.herokuapp.com'
 	          )
 	        ),
 	        React.createElement(
@@ -1272,8 +1272,8 @@
 	          ),
 	          React.createElement(
 	            'a',
-	            { className: 'link', href: '#' },
-	            'repo@github.com'
+	            { className: 'link', href: 'https://github.com/j-steve-martinez/vote-machine' },
+	            'https://github.com/j-steve-martinez/vote-machine'
 	          )
 	        )
 	      )

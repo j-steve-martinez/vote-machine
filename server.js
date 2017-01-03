@@ -1,6 +1,9 @@
 'use strict';
 // mongo ds149998.mlab.com:49998/vote-machine -u <dbuser> -p <dbpassword>
 // mongodb://<dbuser>:<dbpassword>@ds149998.mlab.com:49998/vote-machine
+// https://vote-machine-jsm.herokuapp.com/
+// https://git.heroku.com/vote-machine-jsm.git
+
 var express = require('express');
 var routes = require('./app/routes/index.js');
 var mongoose = require('mongoose');

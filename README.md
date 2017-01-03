@@ -2,7 +2,7 @@
 
 ### Dynamic Web Applications Project: Build a Voting App.
 
-My [Vote Machine](https://vote-machine.herokuapp.com/ "Vote Machine").
+My [Vote Machine](https://vote-machine-jsm.herokuapp.com/ "Vote Machine").
 
 ### License
 

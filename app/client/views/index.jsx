@@ -899,14 +899,14 @@ const About = React.createClass({
         </div>
         <div>
           <div className="credit">Heroku:</div>
-             <a className='link' href="#">
-            vote-machine@heroku.com
+             <a className='link' href="https://vote-machine-jsm.herokuapp.com/">
+            https://vote-machine-jsm.herokuapp.com
           </a>
         </div>
         <div>
           <div className="credit">GitHub:</div>
-             <a className='link' href="#">
-            repo@github.com
+             <a className='link' href="https://github.com/j-steve-martinez/vote-machine">
+            https://github.com/j-steve-martinez/vote-machine
           </a>
         </div>
       </div>

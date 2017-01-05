@@ -40,8 +40,8 @@ function ClickHandler () {
 
 	// get all user polls
 	this.getPolls = function(req, res){
-		console.log('getPolls');
-		console.log(req.user);
+		// console.log('getPolls');
+		// console.log(req.user);
 		var id = req.user.id;
 		Poll
 			.find()

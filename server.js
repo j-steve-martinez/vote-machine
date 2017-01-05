@@ -26,7 +26,7 @@ app.use('/common', express.static(process.cwd() + '/app/client/common'));
 app.use('/views', express.static(process.cwd() + '/app/client/views'));
 
 app.use(session({
-	secret: 'secretClementine',
+	secret: 'secretSauce',
 	resave: true,
 	saveUninitialized: true
 }));

@@ -12,14 +12,6 @@ module.exports = function (app, passport) {
 		// console.log('starting isAuthenticated');
 		// console.log('req.session');
 		// console.log(req.session);
-		// console.log('req.user');
-		// console.log(req.user.username);
-		// console.log('req.rawHeaders');
-		// console.log(req.rawHeaders);
-		// console.log('req.url');
-		// console.log(req.url);
-		// console.log('req.path');
-		// console.log(req.path);
 		if (req.isAuthenticated()) {
 			// console.log('isAuthenticated true');
 			var hour = 36000000
@@ -65,13 +57,7 @@ module.exports = function (app, passport) {
 	// get user info
 	app.route('/api/:id')
 		.get(isLoggedIn, function (req, res) {
-			console.log('/api/:id');
-			console.log('user info');
-			// console.log(req.user);
-			// console.log('github');
-			// console.log(req.user.github.id);
 			res.json(req.user)
-
 		});
 
 	app.route('/auth/github')

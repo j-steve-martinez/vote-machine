@@ -240,7 +240,7 @@
 
 	        // TODO: used for debugged routes remove
 	        // var auth = {id : 243224486, username : 'Joe Blowhard'};
-	        console.log(auth);
+	        // console.log(auth);
 	        // auth.id = auth._id;
 	        _this3.setState({ auth: auth });
 	      });
@@ -250,12 +250,12 @@
 	    value: function render() {
 	      var _this4 = this;
 
-	      console.log('Main this.state');
-	      console.log(this.state);
+	      // console.log('Main this.state');
+	      // console.log(this.state);
 	      var route,
 	          path = this.state.path;
-	      console.log('Path: ');
-	      console.log(path);
+	      // console.log('Path: ');
+	      // console.log(path);
 	      var pollRe = /\/api\/poll\/\w+/;
 	      var profileRe = /\/profile\/\w+/;
 	      var profileNewRe = /\/profile\/\w+\/new/;
@@ -428,7 +428,7 @@
 	    chartData.data.datasets = [];
 	    chartData.data.datasets.push(data);
 	    chartData.options = options;
-	    console.log(chartData);
+	    // console.log(chartData);
 	    myChart = new Chart(ctx, chartData);
 	  },
 	  render: function render() {
@@ -527,8 +527,8 @@
 	      url: apiUrl,
 	      method: 'DELETE'
 	    }).then(function (data) {
-	      console.log('delete done');
-	      console.log(data);
+	      // console.log('delete done');
+	      // console.log(data);
 	      _this6.props.cb('/', 'delete', data._id);
 	    });
 	  },
@@ -866,8 +866,8 @@
 	  displayName: 'NavLink',
 	  clickH: function clickH(e) {
 	    // e.preventDefault();
-	    console.log('NavLink myClick');
-	    console.log(e.target.id);
+	    // console.log('NavLink myClick');
+	    // console.log(e.target.id);
 	    // prevent default for everything except login and logout
 	    if (e.target.id.indexOf('log') <= 0 && e.target.id.indexOf('auth') <= 0) {
 	      e.preventDefault();

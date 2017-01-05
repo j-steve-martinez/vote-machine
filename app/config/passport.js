@@ -26,7 +26,7 @@ module.exports = function (passport) {
 	    callbackURL: configAuth.twitterAuth.callbackURL
 	  },
 	  function(token, tokenSecret, profile, done) {
-	    User.findOne({ 'twitter.id': profile.id }, function (err, user) {
+	    User.findOne({ 'data.id': profile.id }, function (err, user) {
 				// console.log('user');
 				// console.log(user);
 				if (err) {
@@ -39,10 +39,15 @@ module.exports = function (passport) {
 					return done(null, user);
 				} else {
 					var newUser = new User();
-
-					newUser.twitter.id = profile.id;
-					newUser.twitter.username = profile.username;
-					newUser.twitter.displayName = profile.displayName;
+					// console.log('new user profile twitter');
+					// console.log(profile.provider);
+					newUser.provider = profile.provider;
+					newUser.username = profile.username;
+					newUser.id = newUser._id;
+					newUser.uid = profile.provider + "_" + profile.id;
+					newUser.data.id = profile.id;
+					newUser.data.username = profile.username;
+					newUser.data.displayName = profile.displayName;
 
 					newUser.save(function (err) {
 						if (err) {
@@ -63,7 +68,7 @@ module.exports = function (passport) {
 	},
 	function (token, refreshToken, profile, done) {
 		process.nextTick(function () {
-			User.findOne({ 'github.id': profile.id }, function (err, user) {
+			User.findOne({ 'data.id': profile.id }, function (err, user) {
 				if (err) {
 					return done(err);
 				}
@@ -74,11 +79,15 @@ module.exports = function (passport) {
 					return done(null, user);
 				} else {
 					var newUser = new User();
-
-					newUser.github.id = profile.id;
-					newUser.github.username = profile.username;
-					newUser.github.displayName = profile.displayName;
-					newUser.github.publicRepos = profile._json.public_repos;
+					// console.log('new user profile github');
+					// console.log(profile.provider);
+					newUser.provider = profile.provider;
+					newUser.username = profile.username;
+					newUser.id = newUser._id;
+					newUser.uid = profile.provider + "_" + profile.id;
+					newUser.data.id = profile.id;
+					newUser.data.username = profile.username;
+					newUser.data.displayName = profile.displayName;
 
 					newUser.save(function (err) {
 						if (err) {

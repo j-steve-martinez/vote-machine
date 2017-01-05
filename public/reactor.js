@@ -240,7 +240,8 @@
 
 	        // TODO: used for debugged routes remove
 	        // var auth = {id : 243224486, username : 'Joe Blowhard'};
-	        // console.log(auth);
+	        console.log(auth);
+	        // auth.id = auth._id;
 	        _this3.setState({ auth: auth });
 	      });
 	    }
@@ -249,17 +250,15 @@
 	    value: function render() {
 	      var _this4 = this;
 
-	      // console.log('Main this.state');
-	      // console.log(this.state);
-	      // console.log(Please);
-	      getColors(5);
+	      console.log('Main this.state');
+	      console.log(this.state);
 	      var route,
 	          path = this.state.path;
-	      // console.log('Path: ');
-	      // console.log(path);
-	      var pollRe = /\/api\/poll\/\d+/;
-	      var profileRe = /\/profile\/\d+/;
-	      var profileNewRe = /\/profile\/\d+\/new/;
+	      console.log('Path: ');
+	      console.log(path);
+	      var pollRe = /\/api\/poll\/\w+/;
+	      var profileRe = /\/profile\/\w+/;
+	      var profileNewRe = /\/profile\/\w+\/new/;
 	      if (this.state.poll === undefined) {
 	        if (this.state.pollId !== undefined) {
 	          if (this.state.allPolls.length > 0) {
@@ -867,8 +866,8 @@
 	  displayName: 'NavLink',
 	  clickH: function clickH(e) {
 	    // e.preventDefault();
-	    // console.log('NavLink myClick');
-	    // console.log(e.target.id);
+	    console.log('NavLink myClick');
+	    console.log(e.target.id);
 	    // prevent default for everything except login and logout
 	    if (e.target.id.indexOf('log') <= 0 && e.target.id.indexOf('auth') <= 0) {
 	      e.preventDefault();
@@ -1053,6 +1052,18 @@
 	                  cn: 'nav-link',
 	                  to: '/auth/twitter' },
 	                'Twitter'
+	              )
+	            ),
+	            React.createElement(
+	              'li',
+	              { className: 'nav-item' },
+	              React.createElement(
+	                NavLink,
+	                {
+	                  cb: this.props.cb,
+	                  cn: 'nav-link',
+	                  to: '/auth/github' },
+	                'Github'
 	              )
 	            )
 	          )

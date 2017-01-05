@@ -40,9 +40,9 @@ function ClickHandler () {
 
 	// get all user polls
 	this.getPolls = function(req, res){
-		// console.log('twitter id');
-		// console.log(typeof req.user.twitter.id);
-		var id = req.user.twitter.id;
+		console.log('getPolls');
+		console.log(req.user);
+		var id = req.user.id;
 		Poll
 			.find()
 			.exec((err, data) => {
@@ -62,7 +62,7 @@ function ClickHandler () {
 		// console.log(req.params);
 		req.on('data', function(body) {
 			var data = JSON.parse(body);
-			// console.log(data);
+			console.log(data);
 			var name = data.name;
 			var uid = +data.uid;
 

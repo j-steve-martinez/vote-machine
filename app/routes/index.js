@@ -13,7 +13,7 @@ module.exports = function (app, passport) {
 		// console.log('req.session');
 		// console.log(req.session);
 		// console.log('req.user');
-		// console.log(req.user);
+		// console.log(req.user.username);
 		// console.log('req.rawHeaders');
 		// console.log(req.rawHeaders);
 		// console.log('req.url');
@@ -65,16 +65,13 @@ module.exports = function (app, passport) {
 	// get user info
 	app.route('/api/:id')
 		.get(isLoggedIn, function (req, res) {
-			// console.log('/api/:id');
-			// console.log('twitter');
-			// console.log(req.user.twitter.id);
+			console.log('/api/:id');
+			console.log('user info');
+			console.log(req.user);
 			// console.log('github');
 			// console.log(req.user.github.id);
-			if (req.user.twitter.id !== undefined) {
-				res.json(req.user.twitter)
-			} else if (req.user.github.id !== undefined) {
-				res.json(req.user.github);
-			}
+			res.json(req.user)
+
 		});
 
 	app.route('/auth/github')

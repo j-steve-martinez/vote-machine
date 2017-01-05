@@ -67,7 +67,7 @@ module.exports = function (app, passport) {
 		.get(isLoggedIn, function (req, res) {
 			console.log('/api/:id');
 			console.log('user info');
-			console.log(req.user);
+			// console.log(req.user);
 			// console.log('github');
 			// console.log(req.user.github.id);
 			res.json(req.user)

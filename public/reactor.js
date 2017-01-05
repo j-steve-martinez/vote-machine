@@ -574,9 +574,10 @@
 	    // console.log(this.state);
 	    // console.log('Poll props');
 	    // console.log(this.props);
-
-	    var name = this.state.poll.name;
-	    var list = this.state.poll.list;
+	    var poll = this.state.poll;
+	    var name = poll.name;
+	    var list = poll.list;
+	    var uid = poll.uid;
 	    var auth = this.props.auth;
 
 	    var items = list.map(function (item) {
@@ -590,7 +591,7 @@
 	    if (this.state.message === 'results') {
 	      var form = React.createElement(PollResults, { poll: this.state.poll, cb: this.props.cb });
 	    } else {
-	      if (auth.id === false) {
+	      if (auth.id === false || auth.id !== uid) {
 	        // console.log('auth false');
 	        var del = null;
 	        var edit = null;

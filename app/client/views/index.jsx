@@ -798,14 +798,6 @@ const HeaderLogin = React.createClass({
                   Twitter
                 </NavLink>
               </li>
-              <li className="nav-item">
-                <NavLink
-                  cb={this.props.cb}
-                  cn='nav-link'
-                  to="/auth/github">
-                  GitHub
-                </NavLink>
-              </li>
             </ul>
           </li>
           <li className="nav-item">

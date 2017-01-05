@@ -1053,18 +1053,6 @@
 	                  to: '/auth/twitter' },
 	                'Twitter'
 	              )
-	            ),
-	            React.createElement(
-	              'li',
-	              { className: 'nav-item' },
-	              React.createElement(
-	                NavLink,
-	                {
-	                  cb: this.props.cb,
-	                  cn: 'nav-link',
-	                  to: '/auth/github' },
-	                'GitHub'
-	              )
 	            )
 	          )
 	        ),

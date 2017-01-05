@@ -65,11 +65,11 @@ module.exports = function (app, passport) {
 	// get user info
 	app.route('/api/:id')
 		.get(isLoggedIn, function (req, res) {
-			console.log('/api/:id');
-			console.log('twitter');
-			console.log(req.user.twitter.id);
-			console.log('github');
-			console.log(req.user.github.id);
+			// console.log('/api/:id');
+			// console.log('twitter');
+			// console.log(req.user.twitter.id);
+			// console.log('github');
+			// console.log(req.user.github.id);
 			if (req.user.twitter.id !== undefined) {
 				res.json(req.user.twitter)
 			} else if (req.user.github.id !== undefined) {

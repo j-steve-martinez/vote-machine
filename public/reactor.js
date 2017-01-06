@@ -60,16 +60,6 @@
 	var ReactDOM = __webpack_require__(32);
 	var Chart = __webpack_require__(178);
 
-	//* User Story: As an authenticated user, I can keep my polls and come back later to access them.
-	//* User Story: As an authenticated user, I can share my polls with my friends.
-	//* User Story: As an authenticated user, I can see the aggregate results of my polls.
-	//* User Story: As an authenticated user, I can delete polls that I decide I don't want anymore.
-	//* User Story: As an authenticated user, I can create a poll with any number of possible items.
-	//* User Story: As an unauthenticated or authenticated user, I can see and vote on everyone's polls.
-	//* User Story: As an unauthenticated or authenticated user, I can see the results of polls in chart form.
-	//    (This could be implemented using Chart.js or Google Charts.)
-	//* User Story: As an authenticated user, if I don't like the options on a poll, I can create a new option.
-
 	function BP(props) {
 	  var polls = props.polls;
 	  var cb = props.cb;
@@ -205,17 +195,14 @@
 	      var _this2 = this;
 
 	      var path = path;
-	      var url = '/api/allPolls';
-	      var myRequest = new Request(url);
-	      fetch(myRequest).then(function (res) {
-	        return res.json();
+	      var apiUrl = window.location.origin + '/api/allPolls';
+	      $.ajax({
+	        url: apiUrl,
+	        method: 'GET'
 	      }).then(function (allPolls) {
-	        // console.log(allPolls);
 	        var polls = {};
 	        polls.allPolls = allPolls;
 	        polls.path = path;
-	        // console.log(path);
-	        // console.log(polls);
 	        _this2.setState(polls);
 	      });
 	    }
@@ -236,12 +223,6 @@
 	        url: apiUrl,
 	        method: 'GET'
 	      }).then(function (auth) {
-	        // console.log('getting auth');
-
-	        // TODO: used for debugged routes remove
-	        // var auth = {id : 243224486, username : 'Joe Blowhard'};
-	        // console.log(auth);
-	        // auth.id = auth._id;
 	        _this3.setState({ auth: auth });
 	      });
 	    }
@@ -500,11 +481,7 @@
 	      }).then(function (data) {
 	        // console.log('submitted done');
 	        // console.log(data);
-	        // if (data.nModified === 1) {
-	        // console.log('new setState');
-	        // console.log(data);
 	        _this5.setState({ poll: data, message: 'results' });
-	        // }
 	      });
 	    }
 	  },
@@ -512,7 +489,6 @@
 	    e.preventDefault();
 	    // console.log('poll handleChange');
 	    // console.log('value: ' + e.target.value);
-	    // console.log(this.state.poll);
 	    this.setState({ value: e.target.value });
 	  },
 	  handleDelete: function handleDelete(e) {
@@ -543,14 +519,12 @@
 	    var listItem = { key: option, value: 0 };
 	    var newPoll = this.state.poll;
 	    newPoll.list.push({ key: option, value: 0 });
-	    // poll = this.state.poll;
-	    // console.log(document.getElementById('edit').value);
+
 	    var pollId = this.state.poll._id;
 	    listItem.name = this.state.poll.name;
 	    var uid = this.state.poll.uid;
 	    var apiUrl = window.location.origin + '/api/:id/' + pollId;
-	    // console.log(apiUrl);
-	    // console.log(listItem);
+
 	    $.ajax({
 	      url: apiUrl,
 	      // data: listItem,
@@ -562,8 +536,6 @@
 	      // console.log('edit done');
 	      // console.log(data);
 	      if (data.nModified === 1) {
-	        // console.log('edit setState');
-	        // console.log(newPoll);
 	        _this7.setState({ poll: newPoll });
 	      }
 	    });
@@ -591,11 +563,9 @@
 	      var form = React.createElement(PollResults, { poll: this.state.poll, cb: this.props.cb });
 	    } else {
 	      if (auth.id === false || auth.id !== uid) {
-	        // console.log('auth false');
 	        var del = null;
 	        var edit = null;
 	      } else {
-	        // console.log('auth true');
 	        var del = React.createElement(
 	          'button',
 	          { className: 'btn btn-danger btn-sm', onClick: this.handleDelete, type: 'button', name: 'delete' },
@@ -640,6 +610,7 @@
 	          React.createElement(
 	            'select',
 	            {
+	              autoFocus: true,
 	              className: 'form-control',
 	              id: 'take-poll',
 	              value: this.state.value,
@@ -698,9 +669,7 @@
 	        )
 	      );
 	    });
-	    // console.log('list');
-	    // console.log(items);
-	    // var poll = this.props.poll
+
 	    return React.createElement(
 	      Body,
 	      { title: this.props.poll.name },
@@ -728,7 +697,6 @@
 	  render: function render() {
 	    // console.log('Profile');
 	    // console.log(this.props);
-	    // var uid = this.props.params.uid;
 	    return React.createElement(Polls, { title: 'These Are Your Polls', polls: this.props.polls, cb: this.props.cb });
 	  }
 	});
@@ -754,8 +722,8 @@
 	    uid = this.props.auth.id;
 	    // console.log(typeof this.state.items);
 	    // console.log(this.state.items);
-	    if (this.state.items.length <= 0) {
-	      var message = "Please supply a name and options!";
+	    if (this.state.items.length < 3) {
+	      var message = "Please supply a title and a minimum of two options using the Create button!";
 	      this.setState({ message: message });
 	    } else {
 	      this.state.items.forEach(function (value, key) {
@@ -767,11 +735,6 @@
 	      // console.log(uid);
 	      poll = { name: name, uid: uid, list: list };
 
-	      // console.log('Sending Poll:');
-	      // console.log(poll);
-
-	      // console.log('new poll submit id: ' + uid);
-	      // var url = '/api/' + uid + '/new'
 	      var url = '/api/:id/new';
 	      $.ajax({
 	        url: url,
@@ -780,8 +743,6 @@
 	        contentType: "application/json",
 	        dataType: 'json'
 	      }).then(function (data) {
-	        // console.log('new poll fetch data');
-	        // console.log(data);
 	        if (data.isExists) {
 	          message = "Poll Name Already Taken!";
 	          _this8.setState({ message: message });
@@ -799,11 +760,15 @@
 	  },
 	  handleClick: function handleClick(e) {
 	    var text = this.refs.atext.value;
-	    // console.log('form text...');
-	    // console.log(text);
 	    var items = text.split(',');
+	    if (items.length < 3) {
+	      var message = "Please supply a title and a minimum of two options using the Create button!";
+	      // this.setState({message : message});
+	    } else {
+	      var message = '';
+	    }
 	    // console.log(items);
-	    this.setState({ items: items, buttonText: 'Update' });
+	    this.setState({ items: items, buttonText: 'Update', message: message });
 	    e.preventDefault();
 	  },
 	  render: function render() {
@@ -838,24 +803,24 @@
 	        null,
 	        this.state.message
 	      ),
+	      ret,
 	      React.createElement(
 	        'form',
 	        null,
-	        React.createElement('textarea', { ref: 'atext' }),
+	        React.createElement('textarea', { ref: 'atext', autoFocus: true }),
 	        React.createElement(
 	          'div',
 	          null,
 	          React.createElement(
 	            'button',
-	            { ref: 'poll', onClick: this.handleClick },
+	            { ref: 'poll', className: 'btn btn-primary', onClick: this.handleClick },
 	            this.state.buttonText
+	          ),
+	          React.createElement(
+	            'button',
+	            { ref: 'submit', className: 'btn btn-success', onClick: this.handleSubmit },
+	            'Submit'
 	          )
-	        ),
-	        ret,
-	        React.createElement(
-	          'button',
-	          { ref: 'submit', onClick: this.handleSubmit },
-	          'Submit'
 	        )
 	      )
 	    );
@@ -865,9 +830,9 @@
 	var NavLink = React.createClass({
 	  displayName: 'NavLink',
 	  clickH: function clickH(e) {
-	    // e.preventDefault();
 	    // console.log('NavLink myClick');
 	    // console.log(e.target.id);
+
 	    // prevent default for everything except login and logout
 	    if (e.target.id.indexOf('log') <= 0 && e.target.id.indexOf('auth') <= 0) {
 	      e.preventDefault();
@@ -910,6 +875,7 @@
 	      method = 'GET';
 	      type = 'profile';
 	    }
+
 	    // console.log('navlink all data');
 	    // console.log(id);
 	    // console.log(url);
@@ -921,8 +887,6 @@
 	      url: url,
 	      method: method
 	    }).then(function (res) {
-	      // console.log('navlink ajax returned:');
-	      // console.log(res);
 	      _this9.props.cb(route, type, res);
 	    });
 	  },
@@ -945,20 +909,12 @@
 	    var auth = this.props.auth;
 	    // console.log('auth');
 	    // console.log(auth);
-	    var myHeader, name;
-	    auth.id ? name = React.createElement(
-	      'span',
-	      { className: 'navbar-text user' },
-	      'Signed in as ',
-	      auth.username
-	    ) : null;
+	    var myHeader;
 	    if (auth.id !== undefined && auth.id !== false) {
 	      // console.log('is logged in');
-	      // console.log(typeof auth);
 	      myHeader = React.createElement(HeaderLogout, { cb: this.props.cb, auth: auth });
 	    } else {
 	      // console.log('not logged in');
-	      // console.log(typeof auth);
 	      myHeader = React.createElement(HeaderLogin, { cb: this.props.cb });
 	    }
 	    return React.createElement(
@@ -1091,9 +1047,7 @@
 	    // console.log('HeaderLogout');
 	    // console.log(this.props);
 	    var username = this.props.auth.username;
-	    // glyphicon glyphicon-user
 	    var uid = this.props.auth.id;
-	    // var profile = '/api/profile/' + uid;
 	    var profile = '/api/' + uid + '/profile';
 	    var profileNew = '/profile/' + uid + '/new';
 	    return React.createElement(
@@ -1229,7 +1183,14 @@
 	          { href: 'http://www.chartjs.org', target: '_blank' },
 	          ' Chart.js '
 	        ),
-	        ' to render the data in a bar chart.'
+	        ' to render the data in a bar chart.',
+	        React.createElement('br', null),
+	        React.createElement('br', null),
+	        React.createElement(
+	          'span',
+	          { id: 'warning' },
+	          'This application is for educational purposes only.  Any and all data may be removed at anytime without warning.'
+	        )
 	      ),
 	      React.createElement(
 	        'div',

@@ -4,8 +4,6 @@ var path = process.cwd();
 var ClickHandler = require(path + '/app/controllers/clickHandler.server.js');
 var index = path + '/public/index.html';
 
-
-
 module.exports = function (app, passport) {
 
 	function isLoggedIn (req, res, next) {
@@ -14,9 +12,6 @@ module.exports = function (app, passport) {
 		// console.log(req.session);
 		if (req.isAuthenticated()) {
 			// console.log('isAuthenticated true');
-			var hour = 36000000
-			req.session.cookie.expires = new Date(Date.now() + hour)
-			req.session.cookie.maxAge = hour
 			return next();
 		}	else {
 			// console.log('isAuthenticated false');

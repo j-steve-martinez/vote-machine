@@ -9,6 +9,8 @@ var routes = require('./app/routes/index.js');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var session = require('express-session');
+var sessionMongo = require('express-session');
+var MongoDBStore = require('connect-mongodb-session')(sessionMongo);
 
 var app = express();
 if (process.env.NODE_ENV === 'development') {
@@ -16,6 +18,19 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 require('./app/config/passport')(passport);
+
+// Create a new MongoDBStore
+var store = new MongoDBStore(
+	{
+		uri: process.env.MONGO_URI,
+		collection: 'mySessions'
+	});
+
+// Catch errors
+store.on('error', function(error) {
+	assert.ifError(error);
+	assert.ok(false);
+});
 
 mongoose.connect(process.env.MONGO_URI);
 mongoose.Promise = global.Promise;
@@ -28,7 +43,11 @@ app.use('/views', express.static(process.cwd() + '/app/client/views'));
 app.use(session({
 	secret: 'secretSauce',
 	resave: true,
-	saveUninitialized: true
+	saveUninitialized: true,
+	cookie: {
+		maxAge: 1000 * 60 * 60 * 24 * 7
+	},
+	store: store,
 }));
 
 app.use(passport.initialize());

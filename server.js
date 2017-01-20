@@ -13,6 +13,7 @@ var sessionMongo = require('express-session');
 var MongoDBStore = require('connect-mongodb-session')(sessionMongo);
 
 var app = express();
+
 if (process.env.NODE_ENV === 'development') {
 	require('dotenv').load();
 }

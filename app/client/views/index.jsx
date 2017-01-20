@@ -306,9 +306,14 @@ const Polls = React.createClass({
 
 const Poll = React.createClass({
   getInitialState(){
-    var poll = this.props.poll;
+    var message, poll = this.props.poll;
+    if (poll.isAuthReq) {
+      message = 'Poll Requires Login';
+    } else {
+      message = '';
+    }
     return (
-      {poll: poll, message: ''}
+      {poll: poll, message: message}
     )
   },
 
@@ -319,30 +324,64 @@ const Poll = React.createClass({
     // console.log('submitted: ' + submitted);
     // console.log(typeof submitted);
 
-    if (submitted === undefined || submitted === '') {
-      var message = 'Please make a selection'
-      this.setState({message: message})
-    } else {
-      // console.log('form select...');
-      // console.log(submitted);
-      var results = {
-        id : this.state.poll._id,
-        name : this.state.poll.name,
-        key : submitted
+    // Used for localStorage
+    var lsKey, lsValue, url, method, message, chosen, isSetState = false;
+    lsKey = 'votemachine.' + this.state.poll._id;
+    lsValue = submitted;
+    // check if authenticated is required
+    if (this.state.poll.isAuthReq && this.props.auth.id !== false) {
+      // console.log('auth required and is authenticated');
+      if (this.state.poll.voters.indexOf(this.props.auth.id) >= 0) {
+        message = 'You already voted in this poll';
+        isSetState = true;
       }
-      // console.log(results);
-      var url = '/api/poll/' + results.id;
-      $.ajax({
-        url : url,
-        data: JSON.stringify(results),
-        method: 'PUT',
-        contentType: "application/json",
-        dataType: 'json'
-      }).then(data => {
-        // console.log('submitted done');
-        // console.log(data);
-        this.setState({poll : data, message : 'results'})
-      });
+    } else if (this.state.poll.isAuthReq)  {
+      // console.log('this.setState({message : Login to Vote})');
+      message = 'Please Login to Participate in this Poll!';
+      isSetState = true;
+    }
+
+    if (submitted === undefined || submitted === '') {
+      message = 'Please make a selection'
+      this.setState({message: message});
+    } else if (localStorage.getItem(lsKey)) {
+      // console.log('getting localStorage');
+      chosen = localStorage.getItem(lsKey);
+      message = 'You Already Participated in this Poll';
+      this.setState({message: message});
+    } else {
+      if (isSetState) {
+        this.setState({message : message})
+      } else {
+        var results = {
+          id : this.state.poll._id,
+          name : this.state.poll.name,
+          key : submitted
+        }
+
+        if (this.state.poll.isAuthReq) {
+          method = 'PATCH';
+          results.voter = this.props.auth.id;
+        } else {
+          method = 'PUT';
+          // set localStorage
+          localStorage.setItem(lsKey, lsValue);
+        }
+        url = '/api/poll/' + results.id;
+        // console.log('take poll url');
+        // console.log(url);
+        $.ajax({
+          url : url,
+          data: JSON.stringify(results),
+          method: method,
+          contentType: "application/json",
+          dataType: 'json'
+        }).then(data => {
+          // console.log('submitted done');
+          // console.log(data);
+          this.setState({poll : data, message : 'results'})
+        });
+      }
     }
   },
   handleChange(e){
@@ -415,6 +454,9 @@ const Poll = React.createClass({
       items.unshift('')
     }
 
+    // if (this.props.poll.isAuthReq && auth.id === false) {
+    //   var form = <PollResults poll={this.state.poll} cb={this.props.cb}/>
+    // } else
     if (this.state.message === 'results') {
       var form = <PollResults poll={this.state.poll} cb={this.props.cb}/>
     } else {
@@ -460,7 +502,7 @@ const Poll = React.createClass({
             {edit}
           </form>
           <Tweet poll={this.state.poll}/>
-          <h3>
+          <h3 id='poll-message' className='.text-warning'>
             {this.state.message}
           </h3>
           <MyChart poll={this.state.poll}></MyChart>
@@ -524,12 +566,13 @@ const NewPoll = React.createClass({
     return {
       items: [],
       buttonText : 'Create',
-      message : ''
+      message : '',
+      checked : false
     }
   },
   handleSubmit(e){
     e.preventDefault();
-    var message,uid,poll,name, list = [];
+    var message,uid,poll,name, list = [], voters = [];
     uid = this.props.auth.id;
     // console.log(typeof this.state.items);
     // console.log(this.state.items);
@@ -544,7 +587,7 @@ const NewPoll = React.createClass({
       // console.log(name);
       // console.log(list);
       // console.log(uid);
-      poll = {name : name, uid : uid, list : list}
+      poll = {name : name, uid : uid, list : list, isAuthReq : this.state.checked, voters : voters}
 
       var url = '/api/:id/new';
       $.ajax({
@@ -583,6 +626,10 @@ const NewPoll = React.createClass({
     this.setState({items: items, buttonText: 'Update', message : message})
     e.preventDefault()
   },
+  handleCheck(e){
+    // console.log('Add poll check box checked!' + !this.state.checked);
+    this.setState({checked: !this.state.checked });
+  },
   render() {
     // console.log('NewPoll');
     // console.log(this.state);
@@ -592,6 +639,7 @@ const NewPoll = React.createClass({
     } else {
       var ret = <NewPollResults items={this.state.items} />
     }
+
     return (
       <Body title='New Poll'>
         <div>Enter a comma seperated list of items to poll.  The first item should be the poll title</div>
@@ -602,8 +650,15 @@ const NewPoll = React.createClass({
           <form >
             <textarea ref='atext' autoFocus></textarea>
             <div>
-              <button ref='poll' className='btn btn-primary' onClick={this.handleClick}>{this.state.buttonText}</button>
-              <button ref='submit' className='btn btn-success' onClick={this.handleSubmit}>Submit</button>
+              <input type="checkbox" id="mybox" onChange={this.handleCheck}
+                     defaultChecked={this.state.checked} aria-label="..."/>
+              <label className='control-label' >Require Login to Vote</label>
+            </div>
+            <div>
+              <button ref='poll' className='btn btn-primary'
+                onClick={this.handleClick}>{this.state.buttonText}</button>
+              <button ref='submit' className='btn btn-success'
+                onClick={this.handleSubmit}>Submit</button>
             </div>
           </form>
       </Body>

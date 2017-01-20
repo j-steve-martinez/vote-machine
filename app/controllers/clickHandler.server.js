@@ -4,12 +4,6 @@ var Users = require('../models/users.js');
 var Poll = require('../models/polls.js');
 
 function ClickHandler () {
-	this.getAllPolls = function(req, res){
-		Poll.find().exec((err, data) => {
-			if (err) throw err;
-			res.json(data);
-		});
-	}
 
 	this.addDefault = ()=>{
 		Poll.find({}, (err, data) => {
@@ -20,6 +14,7 @@ function ClickHandler () {
 				var poll = new Poll({
 					name : "Do You Like This App?",
 					uid : 'default',
+					isAuthReq : true,
 					list : [
 						{key : 'Yes', value : 0},
 						{key : 'No', value : 0}]
@@ -32,8 +27,14 @@ function ClickHandler () {
 		});
 	}
 
-	// get all user polls
-	this.getPolls = function(req, res){
+	this.getAllPolls = (req, res) => {
+		Poll.find().exec((err, data) => {
+			if (err) throw err;
+			res.json(data);
+		});
+	}
+
+	this.getPolls = (req, res) => {
 		var id = req.user.id;
 		Poll
 			.find()
@@ -95,12 +96,59 @@ function ClickHandler () {
 			var data = JSON.parse(body);
 
 			Poll
+				.find({
+					'_id': data.id,
+					'name' : data.name
+				})
+				.exec((err, poll) => {
+					if (err) throw err;
+					// console.log('takePoll exec poll');
+					var ret = poll[0];
+					// console.log(ret.isAuthReq);
+					// res.json(poll);
+					if (ret.isAuthReq) {
+						res.json({message : 'Not Authorized'})
+					} else {
+						Poll
+						.findOneAndUpdate({
+							'_id': data.id,
+							'name' : data.name,
+							'list.key' : data.key
+						},
+							{
+								$inc : { 'list.$.value': 1 }
+							},
+							// get the update poll
+							{ new: true }
+						)
+						.exec((err, poll) => {
+							if (err) throw err;
+							res.json(poll);
+						});
+					}
+				})
+		});
+	}
+
+	this.takeAuthPoll = (req, res) => {
+		// console.log('takeAuthPoll');
+		// console.log(req.user);
+		req.on('data', function(body) {
+
+			var data = JSON.parse(body);
+			// console.log('takePoll data');
+			// console.log(data);
+
+			Poll
 				.findOneAndUpdate({
 					'_id': data.id,
 					'name' : data.name,
 					'list.key' : data.key
 				},
-					{ $inc : { 'list.$.value': 1 }},
+					{
+						$inc : { 'list.$.value': 1 },
+						$push : { voters : data.voter}
+					},
 					// get the update poll
 					{ new: true }
 				)
@@ -112,7 +160,7 @@ function ClickHandler () {
 	}
 
 	this.editPoll = (req, res) => {
-		// console.log('editPoll');
+		console.log('editPoll');
 		req.on('data', body => {
 
 			var data = JSON.parse(body);

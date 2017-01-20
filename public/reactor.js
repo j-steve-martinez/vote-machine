@@ -447,8 +447,14 @@
 	var Poll = React.createClass({
 	  displayName: 'Poll',
 	  getInitialState: function getInitialState() {
-	    var poll = this.props.poll;
-	    return { poll: poll, message: '' };
+	    var message,
+	        poll = this.props.poll;
+	    if (poll.isAuthReq) {
+	      message = 'Poll Requires Login';
+	    } else {
+	      message = '';
+	    }
+	    return { poll: poll, message: message };
 	  },
 	  handleSubmit: function handleSubmit(e) {
 	    var _this5 = this;
@@ -459,30 +465,70 @@
 	    // console.log('submitted: ' + submitted);
 	    // console.log(typeof submitted);
 
+	    // Used for localStorage
+	    var lsKey,
+	        lsValue,
+	        url,
+	        method,
+	        message,
+	        chosen,
+	        isSetState = false;
+	    lsKey = 'votemachine.' + this.state.poll._id;
+	    lsValue = submitted;
+	    // check if authenticated is required
+	    if (this.state.poll.isAuthReq && this.props.auth.id !== false) {
+	      // console.log('auth required and is authenticated');
+	      if (this.state.poll.voters.indexOf(this.props.auth.id) >= 0) {
+	        message = 'You already voted in this poll';
+	        isSetState = true;
+	      }
+	    } else if (this.state.poll.isAuthReq) {
+	      // console.log('this.setState({message : Login to Vote})');
+	      message = 'Please Login to Participate in this Poll!';
+	      isSetState = true;
+	    }
+
 	    if (submitted === undefined || submitted === '') {
-	      var message = 'Please make a selection';
+	      message = 'Please make a selection';
+	      this.setState({ message: message });
+	    } else if (localStorage.getItem(lsKey)) {
+	      // console.log('getting localStorage');
+	      chosen = localStorage.getItem(lsKey);
+	      message = 'You Already Participated in this Poll';
 	      this.setState({ message: message });
 	    } else {
-	      // console.log('form select...');
-	      // console.log(submitted);
-	      var results = {
-	        id: this.state.poll._id,
-	        name: this.state.poll.name,
-	        key: submitted
-	      };
-	      // console.log(results);
-	      var url = '/api/poll/' + results.id;
-	      $.ajax({
-	        url: url,
-	        data: JSON.stringify(results),
-	        method: 'PUT',
-	        contentType: "application/json",
-	        dataType: 'json'
-	      }).then(function (data) {
-	        // console.log('submitted done');
-	        // console.log(data);
-	        _this5.setState({ poll: data, message: 'results' });
-	      });
+	      if (isSetState) {
+	        this.setState({ message: message });
+	      } else {
+	        var results = {
+	          id: this.state.poll._id,
+	          name: this.state.poll.name,
+	          key: submitted
+	        };
+
+	        if (this.state.poll.isAuthReq) {
+	          method = 'PATCH';
+	          results.voter = this.props.auth.id;
+	        } else {
+	          method = 'PUT';
+	          // set localStorage
+	          localStorage.setItem(lsKey, lsValue);
+	        }
+	        url = '/api/poll/' + results.id;
+	        // console.log('take poll url');
+	        // console.log(url);
+	        $.ajax({
+	          url: url,
+	          data: JSON.stringify(results),
+	          method: method,
+	          contentType: "application/json",
+	          dataType: 'json'
+	        }).then(function (data) {
+	          // console.log('submitted done');
+	          // console.log(data);
+	          _this5.setState({ poll: data, message: 'results' });
+	        });
+	      }
 	    }
 	  },
 	  handleChange: function handleChange(e) {
@@ -559,6 +605,9 @@
 	      items.unshift('');
 	    }
 
+	    // if (this.props.poll.isAuthReq && auth.id === false) {
+	    //   var form = <PollResults poll={this.state.poll} cb={this.props.cb}/>
+	    // } else
 	    if (this.state.message === 'results') {
 	      var form = React.createElement(PollResults, { poll: this.state.poll, cb: this.props.cb });
 	    } else {
@@ -631,7 +680,7 @@
 	        React.createElement(Tweet, { poll: this.state.poll }),
 	        React.createElement(
 	          'h3',
-	          null,
+	          { id: 'poll-message', className: '.text-warning' },
 	          this.state.message
 	        ),
 	        React.createElement(MyChart, { poll: this.state.poll })
@@ -707,7 +756,8 @@
 	    return {
 	      items: [],
 	      buttonText: 'Create',
-	      message: ''
+	      message: '',
+	      checked: false
 	    };
 	  },
 	  handleSubmit: function handleSubmit(e) {
@@ -718,7 +768,8 @@
 	        uid,
 	        poll,
 	        name,
-	        list = [];
+	        list = [],
+	        voters = [];
 	    uid = this.props.auth.id;
 	    // console.log(typeof this.state.items);
 	    // console.log(this.state.items);
@@ -733,7 +784,7 @@
 	      // console.log(name);
 	      // console.log(list);
 	      // console.log(uid);
-	      poll = { name: name, uid: uid, list: list };
+	      poll = { name: name, uid: uid, list: list, isAuthReq: this.state.checked, voters: voters };
 
 	      var url = '/api/:id/new';
 	      $.ajax({
@@ -771,6 +822,10 @@
 	    this.setState({ items: items, buttonText: 'Update', message: message });
 	    e.preventDefault();
 	  },
+	  handleCheck: function handleCheck(e) {
+	    // console.log('Add poll check box checked!' + !this.state.checked);
+	    this.setState({ checked: !this.state.checked });
+	  },
 	  render: function render() {
 	    // console.log('NewPoll');
 	    // console.log(this.state);
@@ -780,6 +835,7 @@
 	    } else {
 	      var ret = React.createElement(NewPollResults, { items: this.state.items });
 	    }
+
 	    return React.createElement(
 	      Body,
 	      { title: 'New Poll' },
@@ -811,14 +867,27 @@
 	        React.createElement(
 	          'div',
 	          null,
+	          React.createElement('input', { type: 'checkbox', id: 'mybox', onChange: this.handleCheck,
+	            defaultChecked: this.state.checked, 'aria-label': '...' }),
+	          React.createElement(
+	            'label',
+	            { className: 'control-label' },
+	            'Require Login to Vote'
+	          )
+	        ),
+	        React.createElement(
+	          'div',
+	          null,
 	          React.createElement(
 	            'button',
-	            { ref: 'poll', className: 'btn btn-primary', onClick: this.handleClick },
+	            { ref: 'poll', className: 'btn btn-primary',
+	              onClick: this.handleClick },
 	            this.state.buttonText
 	          ),
 	          React.createElement(
 	            'button',
-	            { ref: 'submit', className: 'btn btn-success', onClick: this.handleSubmit },
+	            { ref: 'submit', className: 'btn btn-success',
+	              onClick: this.handleSubmit },
 	            'Submit'
 	          )
 	        )
@@ -1555,8 +1624,15 @@
 /* 4 */
 /***/ function(module, exports) {
 
+	/*
+	object-assign
+	(c) Sindre Sorhus
+	@license MIT
+	*/
+
 	'use strict';
 	/* eslint-disable no-unused-vars */
+	var getOwnPropertySymbols = Object.getOwnPropertySymbols;
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
@@ -1577,7 +1653,7 @@
 			// Detect buggy property enumeration order in older V8 versions.
 
 			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-			var test1 = new String('abc');  // eslint-disable-line
+			var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
 			test1[5] = 'de';
 			if (Object.getOwnPropertyNames(test1)[0] === '5') {
 				return false;
@@ -1606,7 +1682,7 @@
 			}
 
 			return true;
-		} catch (e) {
+		} catch (err) {
 			// We don't expect any of the above to throw, but better to be safe.
 			return false;
 		}
@@ -1626,8 +1702,8 @@
 				}
 			}
 
-			if (Object.getOwnPropertySymbols) {
-				symbols = Object.getOwnPropertySymbols(from);
+			if (getOwnPropertySymbols) {
+				symbols = getOwnPropertySymbols(from);
 				for (var i = 0; i < symbols.length; i++) {
 					if (propIsEnumerable.call(from, symbols[i])) {
 						to[symbols[i]] = from[symbols[i]];

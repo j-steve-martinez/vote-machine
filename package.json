@@ -21,11 +21,11 @@
   ],
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
-    "start:dev": "node server.js",
+    "start:dev": "nodemon",
     "start:prod": "node server.js",
-    "dev:client": "webpack --config webpack.config.js -w",
-    "build:client": "webpack -p",
-    "build": "npm run build:client"
+    "build:dev": "webpack -w",
+    "build:prod": "webpack",
+    "build": "npm run build:prod"
   },
   "author": "J. Steve Martinez",
   "license": "MIT",

@@ -6,7 +6,9 @@ var Schema = mongoose.Schema;
 var Poll = new Schema({
     uid: String,
     name: String,
-    list: [{key: String, value: Number}]
+    isAuthReq: Boolean,
+    list: [{key: String, value: Number}],
+    voters: []
 });
 
 module.exports = mongoose.model('Poll', Poll);

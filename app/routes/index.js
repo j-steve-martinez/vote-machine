@@ -79,6 +79,6 @@ module.exports = function (app, passport) {
 		.get(isLoggedIn, clickHandler.getPolls)
 		.put(isLoggedIn, clickHandler.editPoll)
 		.post(isLoggedIn, clickHandler.addPoll)
+		.patch(isLoggedIn, clickHandler.takeAuthPoll)
 		.delete(isLoggedIn, clickHandler.delPoll)
-
 };

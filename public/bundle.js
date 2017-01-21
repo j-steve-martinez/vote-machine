@@ -448,8 +448,9 @@
 	  displayName: 'Poll',
 	  getInitialState: function getInitialState() {
 	    var message,
+	        auth = this.props.auth,
 	        poll = this.props.poll;
-	    if (poll.isAuthReq) {
+	    if (poll.isAuthReq && auth.id === false) {
 	      message = 'Poll Requires Login';
 	    } else {
 	      message = '';
@@ -475,7 +476,7 @@
 	        isSetState = false;
 	    lsKey = 'votemachine.' + this.state.poll._id;
 	    lsValue = submitted;
-	    // check if authenticated is required
+	    // check if authentication is required and already voted
 	    if (this.state.poll.isAuthReq && this.props.auth.id !== false) {
 	      // console.log('auth required and is authenticated');
 	      if (this.state.poll.voters.indexOf(this.props.auth.id) >= 0) {
@@ -483,7 +484,6 @@
 	        isSetState = true;
 	      }
 	    } else if (this.state.poll.isAuthReq) {
-	      // console.log('this.setState({message : Login to Vote})');
 	      message = 'Please Login to Participate in this Poll!';
 	      isSetState = true;
 	    }
@@ -605,9 +605,6 @@
 	      items.unshift('');
 	    }
 
-	    // if (this.props.poll.isAuthReq && auth.id === false) {
-	    //   var form = <PollResults poll={this.state.poll} cb={this.props.cb}/>
-	    // } else
 	    if (this.state.message === 'results') {
 	      var form = React.createElement(PollResults, { poll: this.state.poll, cb: this.props.cb });
 	    } else {

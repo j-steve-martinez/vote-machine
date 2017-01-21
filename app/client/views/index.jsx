@@ -8,9 +8,9 @@ function BP(props){
   const cb = props.cb;
   const links = polls.map((poll) =>
     <div className="panel-body bg-warning" key={poll._id.toString() }><NavLink
-              to={'/api/poll/' + poll._id}
-              cb={cb} >
-              {poll.name}
+      to={'/api/poll/' + poll._id}
+      cb={cb} >
+      {poll.name}
     </NavLink></div>
   );
   return (
@@ -31,7 +31,7 @@ function NewPollResults(props){
   });
   let listItems = poll.map((value, key) =>
     <li key={key.toString()}>
-     {value}
+      {value}
     </li>
   );
   return (
@@ -226,14 +226,14 @@ const Body = React.createClass({
           <div className="jumbotron">
             <h2>{heading}</h2>
           </div>
-            <div className="row">
-              <div className="col-sm-6 poll" >
-                {body}
-              </div>
-              <div className="col-sm-6 chart">
-                <canvas id="myChart" width="400" height="400"></canvas>
-              </div>
+          <div className="row">
+            <div className="col-sm-6 poll" >
+              {body}
             </div>
+            <div className="col-sm-6 chart">
+              <canvas id="myChart" width="400" height="400"></canvas>
+            </div>
+          </div>
         </div>
       );
     }
@@ -294,10 +294,10 @@ const Polls = React.createClass({
     return(
       <Body title={this.props.title}>
         <div className="panel panel-primary">
-            <div className="panel-heading">
-                <h3 className="panel-title">Select a poll to cast your vote</h3>
-            </div>
-            {bodyPanels}
+          <div className="panel-heading">
+            <h3 className="panel-title">Select a poll to cast your vote</h3>
+          </div>
+          {bodyPanels}
         </div>
       </Body>
     )
@@ -306,8 +306,10 @@ const Polls = React.createClass({
 
 const Poll = React.createClass({
   getInitialState(){
-    var message, poll = this.props.poll;
-    if (poll.isAuthReq) {
+    var message,
+    auth = this.props.auth,
+    poll = this.props.poll;
+    if (poll.isAuthReq && auth.id === false) {
       message = 'Poll Requires Login';
     } else {
       message = '';
@@ -316,7 +318,6 @@ const Poll = React.createClass({
       {poll: poll, message: message}
     )
   },
-
   handleSubmit(e){
     // console.log('poll handleSubmit');
     e.preventDefault();
@@ -328,7 +329,7 @@ const Poll = React.createClass({
     var lsKey, lsValue, url, method, message, chosen, isSetState = false;
     lsKey = 'votemachine.' + this.state.poll._id;
     lsValue = submitted;
-    // check if authenticated is required
+    // check if authentication is required and already voted
     if (this.state.poll.isAuthReq && this.props.auth.id !== false) {
       // console.log('auth required and is authenticated');
       if (this.state.poll.voters.indexOf(this.props.auth.id) >= 0) {
@@ -336,7 +337,6 @@ const Poll = React.createClass({
         isSetState = true;
       }
     } else if (this.state.poll.isAuthReq)  {
-      // console.log('this.setState({message : Login to Vote})');
       message = 'Please Login to Participate in this Poll!';
       isSetState = true;
     }
@@ -454,9 +454,6 @@ const Poll = React.createClass({
       items.unshift('')
     }
 
-    // if (this.props.poll.isAuthReq && auth.id === false) {
-    //   var form = <PollResults poll={this.state.poll} cb={this.props.cb}/>
-    // } else
     if (this.state.message === 'results') {
       var form = <PollResults poll={this.state.poll} cb={this.props.cb}/>
     } else {
@@ -647,20 +644,20 @@ const NewPoll = React.createClass({
         <span className="text-danger bg-warning">[ Title, Item1, Item2, Item3 ]</span>
         <h4>{this.state.message}</h4>
         {ret}
-          <form >
-            <textarea ref='atext' autoFocus></textarea>
-            <div>
-              <input type="checkbox" id="mybox" onChange={this.handleCheck}
-                     defaultChecked={this.state.checked} aria-label="..."/>
-              <label className='control-label' >Require Login to Vote</label>
-            </div>
-            <div>
-              <button ref='poll' className='btn btn-primary'
-                onClick={this.handleClick}>{this.state.buttonText}</button>
-              <button ref='submit' className='btn btn-success'
-                onClick={this.handleSubmit}>Submit</button>
-            </div>
-          </form>
+        <form >
+          <textarea ref='atext' autoFocus></textarea>
+          <div>
+            <input type="checkbox" id="mybox" onChange={this.handleCheck}
+              defaultChecked={this.state.checked} aria-label="..."/>
+            <label className='control-label' >Require Login to Vote</label>
+          </div>
+          <div>
+            <button ref='poll' className='btn btn-primary'
+              onClick={this.handleClick}>{this.state.buttonText}</button>
+            <button ref='submit' className='btn btn-success'
+              onClick={this.handleSubmit}>Submit</button>
+          </div>
+        </form>
       </Body>
     )
   }
@@ -773,7 +770,7 @@ const Header = React.createClass({
               </button>
               <NavLink cb={this.props.cb} cn='navbar-brand' to="/">Vote Machine</NavLink>
             </div>
-          {myHeader}
+            {myHeader}
           </div>
         </nav>
       </div>
@@ -795,11 +792,11 @@ const HeaderLogin = React.createClass({
           </li>
           <li className="dropdown">
             <a href="#"
-               className="dropdown-toggle"
-               data-toggle="dropdown"
-               role="button"
-               aria-haspopup="true"
-               aria-expanded="false">Login<span className="caret"></span></a>
+              className="dropdown-toggle"
+              data-toggle="dropdown"
+              role="button"
+              aria-haspopup="true"
+              aria-expanded="false">Login<span className="caret"></span></a>
             <ul className="dropdown-menu">
               <li className="nav-item">
                 <NavLink
@@ -848,11 +845,12 @@ const HeaderLogout = React.createClass({
         <li className="dropdown">
 
           <a href="#"
-             className="dropdown-toggle"
-             data-toggle="dropdown"
-             role="button"
-             aria-haspopup="true"
-             aria-expanded="false">{username}<span className="caret"></span></a>
+            className="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false">{username}<span className="caret"></span>
+          </a>
           <ul className="dropdown-menu">
             <li className="nav-item">
               <NavLink cb={this.props.cb} cn='nav-link' to={profile}>My Polls</NavLink>
@@ -881,51 +879,51 @@ const About = React.createClass({
       <Body title="Vote Machine">
         <p className='about bg-warning'>
           This web site is for the <a href="https://www.freecodecamp.com" target="_blank">freeCodeCamp </a>
-        Dynamic Web Applications Project:
-        <a href="https://www.freecodecamp.com/challenges/build-a-voting-app" target="_blank"> Build a Voting App</a>.
+          Dynamic Web Applications Project:
+          <a href="https://www.freecodecamp.com/challenges/build-a-voting-app" target="_blank"> Build a Voting App</a>.
           <br></br>
           <br></br>
-        It is a full stack web application that uses
-        <a href="https://www.mongodb.com/" target="_blank"> mongoDB </a>
-         for the back end database,
-        <a href="https://nodejs.org" target="_blank"> Node.js </a>
-         for the web server and
-         <a href="https://facebook.github.io/react/" target="_blanks"> React.js </a>
+          It is a full stack web application that uses
+          <a href="https://www.mongodb.com/" target="_blank"> mongoDB </a>
+          for the back end database,
+          <a href="https://nodejs.org" target="_blank"> Node.js </a>
+          for the web server and
+          <a href="https://facebook.github.io/react/" target="_blanks"> React.js </a>
           to render html in the client browser.
-        <br></br>
-        <br></br>
-        The app also uses
-        <a href="http://getbootstrap.com" target="_blank"> Bootstrap </a>
+          <br></br>
+          <br></br>
+          The app also uses
+          <a href="http://getbootstrap.com" target="_blank"> Bootstrap </a>
           for the style sheets and
-        <a href="http://www.chartjs.org" target="_blank"> Chart.js </a> to render the data in a bar chart.
-        <br></br>
-        <br></br>
-        <span id='warning'>
-          This application is for educational purposes only.  Any and all data may be removed at anytime without warning.
-        </span>
-      </p>
-      <div id="credits">
-        <div>
-          <span className="credit">Created By: </span>
+          <a href="http://www.chartjs.org" target="_blank"> Chart.js </a> to render the data in a bar chart.
+          <br></br>
+          <br></br>
+          <span id='warning'>
+            This application is for educational purposes only.  Any and all data may be removed at anytime without warning.
+          </span>
+        </p>
+        <div id="credits">
+          <div>
+            <span className="credit">Created By: </span>
             <a className='link' href="https://github.com/j-steve-martinez" target="_blank">
-            J. Steve Martinez
-          </a>
+              J. Steve Martinez
+            </a>
+          </div>
+          <div>
+            <div className="credit">Heroku:</div>
+            <a className='link' href="https://vote-machine-jsm.herokuapp.com/">
+              https://vote-machine-jsm.herokuapp.com
+            </a>
+          </div>
+          <div>
+            <div className="credit">GitHub:</div>
+            <a className='link' href="https://github.com/j-steve-martinez/vote-machine">
+              https://github.com/j-steve-martinez/vote-machine
+            </a>
+          </div>
         </div>
-        <div>
-          <div className="credit">Heroku:</div>
-             <a className='link' href="https://vote-machine-jsm.herokuapp.com/">
-            https://vote-machine-jsm.herokuapp.com
-          </a>
-        </div>
-        <div>
-          <div className="credit">GitHub:</div>
-             <a className='link' href="https://github.com/j-steve-martinez/vote-machine">
-            https://github.com/j-steve-martinez/vote-machine
-          </a>
-        </div>
-      </div>
 
-    </Body>
+      </Body>
     )
   }
 })
